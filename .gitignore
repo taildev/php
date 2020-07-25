@@ -3,4 +3,3 @@
 /build
 /vendor
 .phpunit.result.cache
-composer.lock
