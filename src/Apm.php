@@ -56,6 +56,19 @@ class Apm
     }
 
     /**
+     * Determine if APM is both initialized AND started a transaction
+     */
+    public static function running(): bool
+    {
+        try {
+            self::get()->transaction();
+            return true;
+        } catch (ApmConfigException $e) {
+            return false;
+        }
+    }
+
+    /**
      * Start a new transaction that traces a request. WARNING, this will overwrite an existing transaction.
      */
     public static function startRequest(?string $method = null, ?string $url = null): Transaction

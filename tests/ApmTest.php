@@ -32,6 +32,18 @@ class ApmTest extends TestCase
         Apm::get();
     }
 
+    public function test_determines_if_transaction_has_started()
+    {
+        $this->assertFalse(Apm::running());
+
+        // After init, still false until transaction is running
+        Apm::init('some-token', 'my-service');
+        $this->assertFalse(Apm::running());
+
+        Apm::startCustom('foo');
+        $this->assertTrue(Apm::running());
+    }
+
     public function test_set_token()
     {
         $apm = new Apm('some-token', 'my-service', 'production');
