@@ -15,7 +15,13 @@ class Http
     protected $urlParams;
 
     /** @var array Headers for request */
-    protected $headers;
+    protected $requestHeaders;
+
+    /** @var array Headers for response */
+    protected $responseHeaders;
+
+    /** @var int Response status */
+    protected $responseStatus;
 
     public function __construct()
     {
@@ -45,8 +51,16 @@ class Http
             $this->setUrlParams($properties['url_params']);
         }
 
-        if (array_key_exists('headers', $properties)) {
-            $this->setHeaders($properties['headers']);
+        if (array_key_exists('request_headers', $properties)) {
+            $this->setRequestHeaders($properties['request_headers']);
+        }
+
+        if (array_key_exists('response_headers', $properties)) {
+            $this->setResponseHeaders($properties['response_headers']);
+        }
+
+        if (array_key_exists('response_status', $properties)) {
+            $this->setResponseStatus($properties['response_status']);
         }
 
         return $this;
@@ -121,9 +135,9 @@ class Http
     /**
      * Get the request headers
      */
-    public function headers(): ?array
+    public function requestHeaders(): ?array
     {
-        return $this->headers;
+        return $this->requestHeaders;
     }
 
     /**
@@ -134,9 +148,48 @@ class Http
      *        'Accept' => 'application/json'
      *      ]
      */
-    public function setHeaders(?array $headers): Http
+    public function setRequestHeaders(?array $headers): Http
     {
-        $this->headers = $headers;
+        $this->requestHeaders = $headers;
+        return $this;
+    }
+
+    /**
+     * Get the response headers
+     */
+    public function responseHeaders(): ?array
+    {
+        return $this->responseHeaders;
+    }
+
+    /**
+     * Set the response headers.
+     *
+     * Should be a key => value array, for example:
+     *      [
+     *        'Content-Type' => 'application/json'
+     *      ]
+     */
+    public function setResponseHeaders(?array $headers): Http
+    {
+        $this->responseHeaders = $headers;
+        return $this;
+    }
+
+    /**
+     * Get the response status
+     */
+    public function responseStatus(): ?int
+    {
+        return $this->responseStatus;
+    }
+
+    /**
+     * Set the response status code.
+     */
+    public function setResponseStatus(?int $status): Http
+    {
+        $this->responseStatus = $status;
         return $this;
     }
 
@@ -149,7 +202,9 @@ class Http
             'method' => $this->method(),
             'url' => $this->url(),
             'url_params' => $this->urlParams(),
-            'headers' => $this->headers(),
+            'request_headers' => $this->requestHeaders(),
+            'response_headers' => $this->responseHeaders(),
+            'response_status' => $this->responseStatus(),
         ];
     }
 }

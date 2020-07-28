@@ -38,13 +38,17 @@ class HttpTest extends TestCase
             'method' => 'custom-method',
             'url' => 'custom-url',
             'url_params' => ['custom' => 'params'],
-            'headers' => ['custom' => 'headers'],
+            'request_headers' => ['custom' => 'request-headers'],
+            'response_headers' => ['custom' => 'response-headers'],
+            'response_status' => 200,
         ]);
 
         $this->assertSame('CUSTOM-METHOD', $http->method());
         $this->assertSame('custom-url', $http->url());
         $this->assertSame(['custom' => 'params'], $http->urlParams());
-        $this->assertSame(['custom' => 'headers'], $http->headers());
+        $this->assertSame(['custom' => 'request-headers'], $http->requestHeaders());
+        $this->assertSame(['custom' => 'response-headers'], $http->responseHeaders());
+        $this->assertSame(200, $http->responseStatus());
     }
 
     public function test_set_method()
@@ -68,11 +72,25 @@ class HttpTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $this->http->urlParams());
     }
 
-    public function test_set_headers()
+    public function test_set_request_headers()
     {
-        $result = $this->http->setHeaders(['authorization' => 'bearer123']);
+        $result = $this->http->setRequestHeaders(['authorization' => 'bearer123']);
         $this->assertSame($this->http, $result);
-        $this->assertSame(['authorization' => 'bearer123'], $this->http->headers());
+        $this->assertSame(['authorization' => 'bearer123'], $this->http->requestHeaders());
+    }
+
+    public function test_set_response_headers()
+    {
+        $result = $this->http->setResponseHeaders(['content-type' => 'application/json']);
+        $this->assertSame($this->http, $result);
+        $this->assertSame(['content-type' => 'application/json'], $this->http->responseHeaders());
+    }
+
+    public function test_set_response_status()
+    {
+        $result = $this->http->setResponseStatus(200);
+        $this->assertSame($this->http, $result);
+        $this->assertSame(200, $this->http->responseStatus());
     }
 
     public function test_output_to_array()
@@ -81,13 +99,17 @@ class HttpTest extends TestCase
         $http->setMethod('get');
         $http->setUrl('/foo');
         $http->setUrlParams(['foo' => 'bar']);
-        $http->setHeaders(['authorization' => 'bearer123']);
+        $http->setRequestHeaders(['authorization' => 'bearer123']);
+        $http->setResponseHeaders(['content-type' => 'application/json']);
+        $http->setResponseStatus(200);
 
         $expect = [
             'method' => 'GET',
             'url' => '/foo',
             'url_params' => ['foo' => 'bar'],
-            'headers' => ['authorization' => 'bearer123'],
+            'request_headers' => ['authorization' => 'bearer123'],
+            'response_headers' => ['content-type' => 'application/json'],
+            'response_status' => 200,
         ];
 
         $this->assertSame($expect, $http->toArray());

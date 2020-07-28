@@ -47,7 +47,9 @@ class TransactionTest extends TestCase
                'method' => 'CUSTOM-HTTP-METHOD',
                'url' => 'custom-url',
                'url_params' => ['foo' => 'bar'],
-               'headers' => ['auth' => '123'],
+               'request_headers' => ['auth' => '123'],
+               'response_headers' => ['type' => 'json'],
+               'response_status' => 200,
            ],
            'service' => [
                'name' => 'custom-service',
