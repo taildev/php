@@ -25,7 +25,7 @@ Initialize APM with your [auth token](https://tail.dev/documentation/quickstart)
 ```php
 use Tail\Apm;
 
-Apm::init('...some-token', 'service-name');
+Apm::init('secret_token', 'service-name');
 Apm::startRequest(); 
 
 register_shutdown_function(function () {

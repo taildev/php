@@ -27,10 +27,11 @@ class Client
             $encoded[] = json_encode($log);
         }
 
+        $url = getenv('TAIL_LOGS_ENDPOINT') ?: self::LOGS_ENDPOINT;
         $payload = implode("\n", $encoded);
 
         $this->guzzle->post(
-            self::LOGS_ENDPOINT,
+            $url,
             [
                 'body' => $payload,
                 'headers' => [
