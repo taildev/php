@@ -15,7 +15,7 @@ class AgentTest extends TestCase
         $agent = Agent::createDefault();
         $this->assertSame('tail-php', $agent->name());
         $this->assertSame('php', $agent->type());
-        $this->assertSame('dev-master', $agent->version());
+        $this->assertNotEmpty($agent->version());
     }
     public function test_fill_from_array()
     {
@@ -36,12 +36,8 @@ class AgentTest extends TestCase
     {
         $agent = Agent::createDefault();
 
-        $expect = [
-            'name' => 'tail-php',
-            'type' => 'php',
-            'version' => 'dev-master',
-        ];
-
-        $this->assertSame($expect, $agent->toArray());
+        $this->assertSame('tail-php', $agent->toArray()['name']);
+        $this->assertSame('php', $agent->toArray()['type']);
+        $this->assertNotEmpty($agent->toArray()['version']);
     }
 }
