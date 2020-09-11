@@ -5,6 +5,7 @@
     "keywords": ["tail.dev", "monitoring", "apm", "exceptions", "logging"],
     "license": "MIT",
     "minimum-stability": "stable",
+    "version": "dev-master",
     "require": {
         "php": "^7.2",
         "ext-json": "*",
