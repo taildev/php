@@ -23,10 +23,20 @@ class Agent
         $agent->setName('tail-php');
         $agent->setType('php');
 
-        $composerFilepath = __DIR__ . '/../../../composer.json';
-        $composerContent = file_get_contents($composerFilepath);
-        $composer = json_decode($composerContent);
-        $agent->setVersion($composer->version);
+        $version = 'unknown';
+        $composerFilepath = __DIR__ . '/../../../../../../composer.lock';
+        if (file_exists($composerFilepath)) {
+            $composerContent = file_get_contents($composerFilepath);
+            $composer = json_decode($composerContent);
+            foreach ($composer->packages as $package) {
+                if ($package->name === 'taildev/php') {
+                    $version = $package->version;
+                    break;
+                }
+            }
+        }
+
+        $agent->setVersion($version);
 
         return $agent;
     }
