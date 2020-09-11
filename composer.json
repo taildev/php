@@ -1,7 +1,6 @@
 {
     "name": "taildev/php",
     "description": "PHP integration for tail.dev",
-    "version": "dev-master",
     "type": "library",
     "keywords": ["tail.dev", "monitoring", "apm", "exceptions", "logging"],
     "license": "MIT",
