@@ -21,6 +21,8 @@ Make sure that the composer autoloader is being required somewhere in your proje
 require __DIR__ . '/vendor/autoload.php';
 ```
 
+#### APM
+
 Initialize APM with your [auth token](https://tail.dev/documentation/quickstart) and service name (any name you'd like to identify this service)
 ```php
 use Tail\Apm;
@@ -42,6 +44,25 @@ $span = Apm::newSpan('fetch-config');
 $span->finish();
 ```
 
+#### Logs
+Initialize logging with your [auth token](https://tail.dev/documentation/quickstart). You may optionally provide a service name and environment if you wish
+```php
+use Tail\Log;
+
+Log::init('secret_token', 'optional-service-name', 'optional-environment');
+```
+
+You can now use the logger anywhere to log a message
+```php
+use Tail\Log;
+
+Log::get()->debug('my debug message');
+
+Log::get()->alert('something went wrong', ['custom_tag' => 'some-value']);
+```
+
+
+#### More
 
 For full documentation see [tail.dev/documentation/php/get-started](https://tail.dev/documentation/php/get-started)
 
