@@ -6,12 +6,10 @@
     "license": "MIT",
     "minimum-stability": "stable",
     "require": {
-        "php": "^7.2",
-        "ext-json": "*",
         "guzzlehttp/guzzle": "6.*|7.*",
-        "monolog/monolog": "^2.1",
-        "nesbot/carbon": "^2.39",
-        "psr/log": "^1.1",
+        "monolog/monolog": "1.*|2.*",
+        "nesbot/carbon": "2.*",
+        "psr/log": "1.*",
         "ramsey/uuid": "^3.9|^4.0"
     },
     "require-dev": {
