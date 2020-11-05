@@ -21,7 +21,7 @@ class Transaction
     /** @var string Unique ID for transaction */
     protected $id;
 
-    /** @var string Name to identify transaction */
+    /** @var string|null Name to identify transaction */
     protected $name;
 
     /** @var string Type of transaction, must be 'request', 'job', or 'custom' */
@@ -149,7 +149,7 @@ class Transaction
     /**
      * Get the transactions name
      */
-    public function name(): string
+    public function name(): ?string
     {
         return $this->name;
     }
@@ -157,7 +157,7 @@ class Transaction
     /**
      * Set the transactions name
      */
-    public function setName(string $name): Transaction
+    public function setName(?string $name): Transaction
     {
         $this->name = $name;
         return $this;
