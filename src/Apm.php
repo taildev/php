@@ -56,6 +56,14 @@ class Apm
     }
 
     /**
+     * Manually set the APM instance
+     */
+    public static function replaceInstance(Apm $apm)
+    {
+        self::$instance = $apm;
+    }
+
+    /**
      * Determine if APM is both initialized AND started a transaction
      */
     public static function running(): bool

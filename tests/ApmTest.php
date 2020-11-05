@@ -32,6 +32,14 @@ class ApmTest extends TestCase
         Apm::get();
     }
 
+    public function test_replace_apm_instance()
+    {
+        $apm1 = Apm::init('some-token', 'my-service', 'production');
+        $apm2 = new Apm('foo-123', 'another-service');
+        Apm::replaceInstance($apm2);
+        $this->assertNotSame($apm1, Apm::get());
+    }
+
     public function test_determines_if_transaction_has_started()
     {
         $this->assertFalse(Apm::running());
