@@ -105,9 +105,9 @@ class ApmTest extends TestCase
     public function test_start_custom_transaction()
     {
         Apm::init('some-token', 'my-service', 'production');
-        $t = Apm::startCustom('my-transaction');
+        $t = Apm::startCustom('my-type', 'my-transaction');
         $this->assertNotEmpty($t->id());
-        $this->assertSame(Transaction::TYPE_CUSTOM, $t->type());
+        $this->assertSame('my-type', $t->type());
         $this->assertSame('my-transaction', $t->name());
         $this->assertSame('my-service', $t->service()->name());
         $this->assertSame('production', $t->service()->environment());

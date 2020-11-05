@@ -33,7 +33,7 @@ class TransactionTest extends TestCase
            'trace' => [
                'id' => 'custom-transaction-id',
                'name' => 'custom-name',
-               'type' => Transaction::TYPE_CUSTOM,
+               'type' => Transaction::TYPE_JOB,
                'start_time' => 123.1,
                'end_time' => 456.2,
                'duration' => 333.1,
@@ -111,13 +111,6 @@ class TransactionTest extends TestCase
         $this->assertSame([], $this->transaction->spans());
     }
 
-    public function test_create_with_invalid_type()
-    {
-        $this->expectException(TransactionConfigException::class);
-        $this->expectExceptionMessage('Transaction type must be one of request, job, or custom');
-        new Transaction('id-123', 'some-transaction', '!!!INVALID!!!', 'my-service', 'prod');
-    }
-
     public function test_set_id()
     {
         $result = $this->transaction->setId('foo-id');
@@ -137,13 +130,6 @@ class TransactionTest extends TestCase
         $result = $this->transaction->setType(Transaction::TYPE_JOB);
         $this->assertSame($this->transaction, $result);
         $this->assertSame(Transaction::TYPE_JOB, $this->transaction->type());
-    }
-
-    public function test_set_type_with_invalid_type()
-    {
-        $this->expectException(TransactionConfigException::class);
-        $this->expectExceptionMessage('Transaction type must be one of request, job, or custom');
-        $this->transaction->setType('nope');
     }
 
     public function test_set_start_time()

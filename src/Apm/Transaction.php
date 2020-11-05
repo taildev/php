@@ -17,7 +17,6 @@ class Transaction
 
     const TYPE_REQUEST = 'request';
     const TYPE_JOB = 'job';
-    const TYPE_CUSTOM = 'custom';
 
     /** @var string Unique ID for transaction */
     protected $id;
@@ -111,7 +110,7 @@ class Transaction
 
     public function __construct(
         string $id,
-        string $name,
+        ?string $name,
         string $type,
         string $serviceName,
         ?string $environment = null
@@ -173,15 +172,10 @@ class Transaction
     }
 
     /**
-     * Set the transaction type. Should be one of request, job, or custom.
+     * Set the transaction type.
      */
     public function setType(string $type): Transaction
     {
-        $supportedTypes = [self::TYPE_REQUEST, self::TYPE_JOB, self::TYPE_CUSTOM];
-        if (!in_array($type, $supportedTypes)) {
-            throw new TransactionConfigException('Transaction type must be one of request, job, or custom');
-        }
-
         $this->type = $type;
         return $this;
     }

@@ -95,9 +95,9 @@ class Apm
     /**
      * Start a new transaction that traces a custom type. WARNING, this will overwrite an existing transaction.
      */
-    public static function startCustom(string $name): Transaction
+    public static function startCustom(string $type, ?string $name = null): Transaction
     {
-        return self::get()->startCustomTransaction($name);
+        return self::get()->startCustomTransaction($type, $name);
     }
 
     /**
@@ -272,10 +272,9 @@ class Apm
         return $t;
     }
 
-    public function startCustomTransaction(string $name): Transaction
+    public function startCustomTransaction(string $type, ?string $name = null): Transaction
     {
         $id = Id::generate();
-        $type = Transaction::TYPE_CUSTOM;
 
         $t = new Transaction($id, $name, $type, $this->serviceName, $this->environment);
         $this->transaction = $t;
