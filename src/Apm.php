@@ -239,7 +239,7 @@ class Apm
         return $this->client;
     }
 
-    protected function startRequestTransaction(?string $method = null, ?string $url = null): Transaction
+    public function startRequestTransaction(?string $method = null, ?string $url = null): Transaction
     {
         $id = Id::generate();
         $type = Transaction::TYPE_REQUEST;
@@ -261,7 +261,7 @@ class Apm
         return $this->transaction = $t;
     }
 
-    protected function startJobTransaction(string $name): Transaction
+    public function startJobTransaction(string $name): Transaction
     {
         $id = Id::generate();
         $type = Transaction::TYPE_JOB;
@@ -272,7 +272,7 @@ class Apm
         return $t;
     }
 
-    protected function startCustomTransaction(string $name): Transaction
+    public function startCustomTransaction(string $name): Transaction
     {
         $id = Id::generate();
         $type = Transaction::TYPE_CUSTOM;
@@ -283,7 +283,7 @@ class Apm
         return $t;
     }
 
-    protected function finishAndSend(): Apm
+    public function finishAndSend(): Apm
     {
         $t = $this->transaction();
 
