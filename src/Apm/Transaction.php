@@ -21,11 +21,11 @@ class Transaction
     /** @var string Unique ID for transaction */
     protected $id;
 
+    /** @var string Type of transaction */
+    protected $type;
+
     /** @var string|null Name to identify transaction */
     protected $name;
-
-    /** @var string Type of transaction, must be 'request', 'job', or 'custom' */
-    protected $type;
 
     /** @var float Start time as milliseconds since epoch */
     protected $startTime;
@@ -62,8 +62,8 @@ class Transaction
         # trace properties
         $trace = $properties['trace'];
         $id = $trace['id'];
-        $name = $trace['name'];
         $type = $trace['type'];
+        $name = $trace['name'];
         $startTime = $trace['start_time'];
         $endTime = array_key_exists('end_time', $trace) ? $trace['end_time'] : null;
 
@@ -73,7 +73,7 @@ class Transaction
         $environment = array_key_exists('environment', $service) ? $service['environment'] : null;
 
         # create transaction
-        $transaction = new Transaction($id, $name, $type, $serviceName);
+        $transaction = new Transaction($id, $type, $name, $serviceName);
         $transaction->setStartTime($startTime);
         $transaction->setEndTime($endTime);
         $transaction->service()->setEnvironment($environment);
@@ -110,15 +110,15 @@ class Transaction
 
     public function __construct(
         string $id,
-        ?string $name,
         string $type,
+        ?string $name,
         string $serviceName,
         ?string $environment = null
     ) {
         $this->id = $id;
+        $this->type = $type;
         $this->name = $name;
         $this->startTime = Timestamp::nowInMs();
-        $this->setType($type);
 
         $this->agent = Agent::createDefault();
         $this->http = new Http();
@@ -326,8 +326,8 @@ class Transaction
         return [
             'trace' => [
                 'id' => $this->id(),
-                'name' => $this->name(),
                 'type' => $this->type(),
+                'name' => $this->name(),
                 'start_time' => $this->startTime(),
                 'end_time' => $this->endTime(),
                 'duration' => $this->duration(),

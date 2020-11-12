@@ -20,8 +20,8 @@ class TransactionTest extends TestCase
         parent::setUp();
         $this->transaction = new Transaction(
             'id-123',
-            'some-transaction',
             Transaction::TYPE_REQUEST,
+            'some-transaction',
             'my-service',
             'prod'
         );
@@ -32,8 +32,8 @@ class TransactionTest extends TestCase
         $transaction = Transaction::createFromArray($data = [
            'trace' => [
                'id' => 'custom-transaction-id',
-               'name' => 'custom-name',
                'type' => Transaction::TYPE_JOB,
+               'name' => 'custom-name',
                'start_time' => 123.1,
                'end_time' => 456.2,
                'duration' => 333.1,
@@ -94,8 +94,8 @@ class TransactionTest extends TestCase
     public function test_construct_with_properties()
     {
         $this->assertSame('id-123', $this->transaction->id());
-        $this->assertSame('some-transaction', $this->transaction->name());
         $this->assertSame(Transaction::TYPE_REQUEST, $this->transaction->type());
+        $this->assertSame('some-transaction', $this->transaction->name());
         $this->assertSame('my-service', $this->transaction->service()->name());
         $this->assertSame('prod', $this->transaction->service()->environment());
 
@@ -118,18 +118,18 @@ class TransactionTest extends TestCase
         $this->assertSame('foo-id', $this->transaction->id());
     }
 
-    public function test_set_name()
-    {
-        $result = $this->transaction->setName('foo');
-        $this->assertSame($this->transaction, $result);
-        $this->assertSame('foo', $this->transaction->name());
-    }
-
     public function test_set_type()
     {
         $result = $this->transaction->setType(Transaction::TYPE_JOB);
         $this->assertSame($this->transaction, $result);
         $this->assertSame(Transaction::TYPE_JOB, $this->transaction->type());
+    }
+
+    public function test_set_name()
+    {
+        $result = $this->transaction->setName('foo');
+        $this->assertSame($this->transaction, $result);
+        $this->assertSame('foo', $this->transaction->name());
     }
 
     public function test_set_start_time()
@@ -205,8 +205,8 @@ class TransactionTest extends TestCase
         $expect = [
             'trace' => [
                 'id' => 'id-123',
-                'name' => 'some-transaction',
                 'type' => Transaction::TYPE_REQUEST,
+                'name' => 'some-transaction',
                 'start_time' => 123.1,
                 'end_time' => 234.2,
                 'duration' => 111.1,

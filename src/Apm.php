@@ -243,7 +243,7 @@ class Apm
     {
         $id = Id::generate();
         $type = Transaction::TYPE_REQUEST;
-        $t = new Transaction($id, "", $type, $this->serviceName, $this->environment);
+        $t = new Transaction($id, $type, null, $this->serviceName, $this->environment);
 
         if ($method) {
             $t->http()->setMethod($method);
@@ -261,12 +261,12 @@ class Apm
         return $this->transaction = $t;
     }
 
-    public function startJobTransaction(string $name): Transaction
+    public function startJobTransaction(?string $name = null): Transaction
     {
         $id = Id::generate();
         $type = Transaction::TYPE_JOB;
 
-        $t = new Transaction($id, $name, $type, $this->serviceName, $this->environment);
+        $t = new Transaction($id, $type, $name, $this->serviceName, $this->environment);
         $this->transaction = $t;
 
         return $t;
@@ -276,7 +276,7 @@ class Apm
     {
         $id = Id::generate();
 
-        $t = new Transaction($id, $name, $type, $this->serviceName, $this->environment);
+        $t = new Transaction($id, $type, $name, $this->serviceName, $this->environment);
         $this->transaction = $t;
 
         return $t;
