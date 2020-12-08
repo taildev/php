@@ -123,9 +123,9 @@ class Apm
     /**
      * Create new span for current transaction
      */
-    public static function newSpan(string $name): Span
+    public static function newSpan(string $type, string $name): Span
     {
-        return self::get()->transaction()->newSpan($name);
+        return self::get()->transaction()->newSpan($type, $name);
     }
 
     /**

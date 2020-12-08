@@ -7,7 +7,6 @@ use Tail\Apm\Span;
 use Tests\TestCase;
 use Tail\Apm\Transaction;
 use Tail\Apm\Support\Timestamp;
-use Tail\Apm\Exceptions\TransactionConfigException;
 
 class TransactionTest extends TestCase
 {
@@ -68,6 +67,7 @@ class TransactionTest extends TestCase
            'spans' => [
                [
                    'trace' => [
+                       'type' => 'some-type',
                        'name' => 'some-span',
                        'id' => 'span-id',
                        'parent_id' => 'span-parent-id',
@@ -78,7 +78,6 @@ class TransactionTest extends TestCase
                    ],
                    'database' => [
                        'name' => 'custom-db-name',
-                       'operation' => 'custom-db-operation',
                        'query' => 'custom-db-query',
                    ],
                    'tags' => [
@@ -181,17 +180,54 @@ class TransactionTest extends TestCase
 
     public function test_new_span()
     {
-        $span = $this->transaction->newSpan('some-name');
+        $span = $this->transaction->newSpan('some-type', 'some-name');
+        $this->assertSame('some-type', $span->type());
         $this->assertSame('some-name', $span->name());
         $this->assertNotEmpty($span->id());
         $this->assertSame('id-123', $span->parentId());
         $this->assertSame('id-123', $span->transaction()->id());
 
-        $spanCustomParent = $this->transaction->newSpan('some-name', 'custom-id');
+        $spanCustomParent = $this->transaction->newSpan('some-type', 'some-name', 'custom-id');
         $this->assertSame('custom-id', $spanCustomParent->parentId());
         $this->assertSame('id-123', $spanCustomParent->transaction()->id());
 
         $this->assertSame([$span, $spanCustomParent], $this->transaction->spans());
+    }
+
+    public function test_new_custom_span()
+    {
+        $span = $this->transaction->newCustomSpan('some-name');
+        $this->assertSame(Span::TYPE_CUSTOM, $span->type());
+        $this->assertSame('some-name', $span->name());
+        $this->assertNotEmpty($span->id());
+        $this->assertSame('id-123', $span->parentId());
+    }
+
+    public function test_new_database_span()
+    {
+        $span = $this->transaction->newDatabaseSpan('some-name');
+        $this->assertSame(Span::TYPE_DATABASE, $span->type());
+        $this->assertSame('some-name', $span->name());
+        $this->assertNotEmpty($span->id());
+        $this->assertSame('id-123', $span->parentId());
+    }
+
+    public function test_new_cache_span()
+    {
+        $span = $this->transaction->newCacheSpan('some-name');
+        $this->assertSame(Span::TYPE_CACHE, $span->type());
+        $this->assertSame('some-name', $span->name());
+        $this->assertNotEmpty($span->id());
+        $this->assertSame('id-123', $span->parentId());
+    }
+
+    public function test_new_filesystem_span()
+    {
+        $span = $this->transaction->newFilesystemSpan('some-name');
+        $this->assertSame(Span::TYPE_FILESYSTEM, $span->type());
+        $this->assertSame('some-name', $span->name());
+        $this->assertNotEmpty($span->id());
+        $this->assertSame('id-123', $span->parentId());
     }
 
     public function test_output_to_array()
@@ -199,8 +235,8 @@ class TransactionTest extends TestCase
         $this->transaction->setStartTime(123.1);
         $this->transaction->setEndTime(234.2);
 
-        $span1 = $this->transaction->newSpan('1')->setStartTime(2)->setEndTime(4);
-        $span2 = $this->transaction->newSpan('2')->setStartTime(2)->setEndTime(4);
+        $span1 = $this->transaction->newSpan('custom', '1')->setStartTime(2)->setEndTime(4);
+        $span2 = $this->transaction->newSpan('custom', '2')->setStartTime(2)->setEndTime(4);
 
         $expect = [
             'trace' => [

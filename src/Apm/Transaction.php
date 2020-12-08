@@ -303,14 +303,46 @@ class Transaction
     /**
      * Create a new child span for the transaction. If parentId is not provided, the transaction ID is used as the parent ID for the span.
      */
-    public function newSpan(string $name, ?string $parentId = null): Span
+    public function newSpan(string $type, string $name, ?string $parentId = null): Span
     {
         $id = Id::generate();
         $parentId = $parentId ?: $this->id();
-        $span = new Span($this, $name, $id, $parentId);
+        $span = new Span($this, $type, $name, $id, $parentId);
         $this->spans[] = $span;
 
         return $span;
+    }
+
+    /**
+     * Create a new "custom" type child span for the transaction. If parentId is not provided, the transaction ID is used as the parent ID for the span.
+     */
+    public function newCustomSpan(string $name, ?string $parentId = null): Span
+    {
+        return $this->newSpan(Span::TYPE_CUSTOM, $name, $parentId);
+    }
+    
+    /**
+     * Create a new "database" type child span for the transaction. If parentId is not provided, the transaction ID is used as the parent ID for the span.
+     */
+    public function newDatabaseSpan(string $name, ?string $parentId = null): Span
+    {
+        return $this->newSpan(Span::TYPE_DATABASE, $name, $parentId);
+    }
+
+    /**
+     * Create a new "cache" type child span for the transaction. If parentId is not provided, the transaction ID is used as the parent ID for the span.
+     */
+    public function newCacheSpan(string $name, ?string $parentId = null): Span
+    {
+        return $this->newSpan(Span::TYPE_CACHE, $name, $parentId);
+    }
+
+    /**
+     * Create a new "filesystem" type child span for the transaction. If parentId is not provided, the transaction ID is used as the parent ID for the span.
+     */
+    public function newFilesystemSpan(string $name, ?string $parentId = null): Span
+    {
+        return $this->newSpan(Span::TYPE_FILESYSTEM, $name, $parentId);
     }
 
     /**

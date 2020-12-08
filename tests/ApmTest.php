@@ -135,7 +135,7 @@ class ApmTest extends TestCase
         Apm::init('some-token', 'my-service');
 
         $t = Apm::startJob('some-job');
-        $span = Apm::newSpan('span-name');
+        $span = Apm::newSpan('span-type', 'span-name');
 
         $this->assertSame($t->id(), $span->parentId());
     }
@@ -259,9 +259,9 @@ class ApmTest extends TestCase
 
         $t = Apm::startRequest('GET', '/foo');
 
-        $span1 = $t->newSpan('1');
-        $span2 = $t->newSpan('1')->finish();
-        $span3 = $t->newSpan('1');
+        $span1 = $t->newSpan('custom', '1');
+        $span2 = $t->newSpan('custom', '1')->finish();
+        $span3 = $t->newSpan('custom', '1');
         $doneAt = $span2->endTime();
         usleep(10000);
 

@@ -22,12 +22,10 @@ class DatabaseTest extends TestCase
         $database = new Database();
         $database->fillFromArray([
             'name' => 'custom-name',
-            'operation' => 'custom-operation',
             'query' => 'custom-query',
         ]);
 
         $this->assertSame('custom-name', $database->name());
-        $this->assertSame('custom-operation', $database->operation());
         $this->assertSame('custom-query', $database->query());
     }
 
@@ -36,27 +34,6 @@ class DatabaseTest extends TestCase
         $result = $this->database->setName('mysql');
         $this->assertSame($this->database, $result);
         $this->assertSame('mysql', $this->database->name());
-    }
-
-    public function test_set_operation()
-    {
-        $result = $this->database->setOperation('read');
-        $this->assertSame($this->database, $result);
-        $this->assertSame('read', $this->database->operation());
-    }
-
-    public function test_is_read_operation()
-    {
-        $result = $this->database->isReadOperation();
-        $this->assertSame($this->database, $result);
-        $this->assertSame(Database::READ_OPERATION, $this->database->operation());
-    }
-
-    public function test_is_write_operation()
-    {
-        $result = $this->database->isWriteOperation();
-        $this->assertSame($this->database, $result);
-        $this->assertSame(Database::WRITE_OPERATION, $this->database->operation());
     }
 
     public function test_set_query()
@@ -70,12 +47,10 @@ class DatabaseTest extends TestCase
     {
         $database = new Database();
         $database->setName('mysql');
-        $database->setOperation('read');
         $database->setQuery('select *');
 
         $expect = [
             'name' => 'mysql',
-            'operation' => 'read',
             'query' => 'select *',
         ];
 

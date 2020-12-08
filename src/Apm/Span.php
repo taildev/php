@@ -9,8 +9,16 @@ use Tail\Apm\Support\Timestamp;
 class Span
 {
 
+    public const TYPE_DATABASE = 'database';
+    public const TYPE_CACHE = 'cache';
+    public const TYPE_FILESYSTEM = 'filesystem';
+    public const TYPE_CUSTOM = 'custom';
+
     /** @var Transaction Transaction that span belongs to */
     protected $transaction;
+
+    /** @var string Type of span */
+    protected $type;
 
     /** @var string Name to identify span */
     protected $name;
@@ -40,6 +48,7 @@ class Span
     {
         # span properties
         $trace = $properties['trace'];
+        $type = $trace['type'];
         $name = $trace['name'];
         $id = $trace['id'];
         $parentId = $trace['parent_id'];
@@ -47,7 +56,7 @@ class Span
         $endTime = array_key_exists('end_time', $trace) ? $trace['end_time'] : null;
 
         # create span
-        $span = new Span($transaction, $name, $id, $parentId);
+        $span = new Span($transaction, $type, $name, $id, $parentId);
         $span->setStartTime($startTime);
         $span->setEndTime($endTime);
 
@@ -62,9 +71,10 @@ class Span
         return $span;
     }
 
-    public function __construct(Transaction $transaction, string $name, string $id, string $parentId)
+    public function __construct(Transaction $transaction, string $type, string $name, string $id, string $parentId)
     {
         $this->transaction = $transaction;
+        $this->type = $type;
         $this->name = $name;
         $this->id = $id;
         $this->parentId = $parentId;
@@ -76,11 +86,43 @@ class Span
     }
 
     /**
-     * Create a new child span with the given name and this span as the parent.
+     * Create a new child span with the given type, name and this span as the parent.
      */
-    public function newChildSpan(string $name): Span
+    public function newChildSpan(string $type, string $name): Span
     {
-        return $this->transaction->newSpan($name, $this->id());
+        return $this->transaction->newSpan($type, $name, $this->id());
+    }
+
+    /**
+     * Create a new "custom" type child span
+     */
+    public function newChildCustomSpan(string $name): Span
+    {
+        return $this->newChildSpan(self::TYPE_CUSTOM, $name);
+    }
+
+    /**
+     * Create a new "database" type child span
+     */
+    public function newChildDatabaseSpan(string $name): Span
+    {
+        return $this->newChildSpan(self::TYPE_DATABASE, $name);
+    }
+
+    /**
+     * Create a new "cache" type child span
+     */
+    public function newChildCacheSpan(string $name): Span
+    {
+        return $this->newChildSpan(self::TYPE_CACHE, $name);
+    }
+
+    /**
+     * Create a new "filesystem" type child span
+     */
+    public function newChildFilesystemSpan(string $name): Span
+    {
+        return $this->newChildSpan(self::TYPE_FILESYSTEM, $name);
     }
 
     /**
@@ -89,6 +131,23 @@ class Span
     public function transaction(): Transaction
     {
         return $this->transaction;
+    }
+
+    /**
+     * Get spans type
+     */
+    public function type(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set the spans type
+     */
+    public function setType(string $type): Span
+    {
+        $this->type = $type;
+        return $this;
     }
 
     /**
@@ -218,6 +277,7 @@ class Span
     {
         return [
             'trace' => [
+                'type' => $this->type(),
                 'name' => $this->name(),
                 'id' => $this->id,
                 'parent_id' => $this->parentId(),
