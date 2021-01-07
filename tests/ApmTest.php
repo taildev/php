@@ -4,7 +4,7 @@ namespace Tests;
 
 use Mockery;
 use Tail\Apm;
-use GuzzleHttp\Client;
+use Tail\Client;
 use Tail\Apm\Transaction;
 use Tail\Apm\Exceptions\ApmConfigException;
 
@@ -14,8 +14,8 @@ class ApmTest extends TestCase
     public function test_constructs_with_properties()
     {
         $apm = new Apm('some-token', 'my-service', 'production');
-        $this->assertSame('some-token', $apm->token());
         $this->assertNotEmpty($apm->client());
+        $this->assertSame('some-token', $apm->client()->getToken());
     }
 
     public function test_apm_init()
@@ -50,13 +50,6 @@ class ApmTest extends TestCase
 
         Apm::startCustom('foo');
         $this->assertTrue(Apm::running());
-    }
-
-    public function test_set_token()
-    {
-        $apm = new Apm('some-token', 'my-service', 'production');
-        $apm->setToken('new-token');
-        $this->assertSame('new-token', $apm->token());
     }
 
     public function test_transaction_thats_not_started_throws_an_exception()
@@ -198,17 +191,9 @@ class ApmTest extends TestCase
 
         Apm::startRequest('GET', '/foo');
 
-        $client->shouldReceive('post')->withArgs(function ($url, $options) {
-            if ($url !== 'https://api.tail.dev/ingest/transactions') {
-                return false;
-            }
-
-            if ($options['json'] !== Apm::get()->transaction()->toArray()) {
-                return false;
-            }
-
-            return true;
-        });
+        $t = Apm::get()->transaction();
+        $t->finish();
+        $client->shouldReceive('sendApm')->with($t->toArray());
 
         Apm::finish();
 
@@ -220,7 +205,7 @@ class ApmTest extends TestCase
     public function test_finish_and_send_sets_the_finish_time_for_transaction_if_not_set()
     {
         $client = Mockery::mock(Client::class);
-        $client->shouldReceive('post');
+        $client->shouldReceive('sendApm');
 
         $apm = Apm::init('some-token', 'my-service', 'production');
         $apm->setClient($client);
@@ -234,7 +219,7 @@ class ApmTest extends TestCase
     public function test_finish_and_send_doesnt_change_transactions_finished_time_if_already_set()
     {
         $client = Mockery::mock(Client::class);
-        $client->shouldReceive('post');
+        $client->shouldReceive('sendApm');
 
         $apm = Apm::init('some-token', 'my-service', 'production');
         $apm->setClient($client);
@@ -252,7 +237,7 @@ class ApmTest extends TestCase
     public function test_finish_and_spend_sets_the_end_time_for_any_unfinished_spans()
     {
         $client = Mockery::mock(Client::class);
-        $client->shouldReceive('post');
+        $client->shouldReceive('sendApm');
 
         $apm = Apm::init('some-token', 'my-service', 'production');
         $apm->setClient($client);

@@ -3,7 +3,6 @@
 namespace Tail;
 
 use Tail\Apm\Span;
-use GuzzleHttp\Client;
 use Tail\Apm\Meta\User;
 use Tail\Apm\Meta\Tags;
 use Tail\Apm\Meta\Http;
@@ -15,9 +14,6 @@ use Tail\Apm\Exceptions\ApmConfigException;
 
 class Apm
 {
-
-    /** @var string Auth token for tracing service */
-    protected $token;
 
     /** @var string Name to identify service */
     protected $serviceName;
@@ -186,11 +182,10 @@ class Apm
 
     public function __construct(string $token, string $serviceName, ?string $environment = null, ?Client $client = null)
     {
-        $this->token = $token;
         $this->serviceName = $serviceName;
         $this->environment = $environment;
 
-        $this->client = $client ?: new Client();
+        $this->client = $client ?: new Client($token);
     }
 
     /**
@@ -206,28 +201,11 @@ class Apm
     }
 
     /**
-     * Get auth token for tracing service
-     */
-    public function token(): ?string
-    {
-        return $this->token;
-    }
-
-    /**
-     * Set the auth token for tracing service
-     */
-    public function setToken(string $token): Apm
-    {
-        $this->token = $token;
-        return $this;
-    }
-
-    /**
-     * Set the HTTP client
+     * Set the client
      */
     public function setClient(Client $client): Apm
     {
-        $this->client= $client;
+        $this->client = $client;
         return $this;
     }
 
@@ -296,14 +274,7 @@ class Apm
             }
         }
 
-        $url = getenv('TAIL_TRACE_ENDPOINT') ?: 'https://api.tail.dev/ingest/transactions';
-        $this->client()->post($url, [
-            'json' => $this->transaction()->toArray(),
-            'headers' => [
-                'Authorization' => 'Bearer '.$this->token(),
-            ],
-        ]);
-
+        $this->client->sendApm($this->transaction->toArray());
         $this->transaction = null;
 
         return $this;
