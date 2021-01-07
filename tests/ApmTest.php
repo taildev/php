@@ -7,6 +7,7 @@ use Tail\Apm;
 use Tail\Client;
 use Tail\Apm\Transaction;
 use Tail\Apm\Exceptions\ApmConfigException;
+use Tail\Apm\Span;
 
 class ApmTest extends TestCase
 {
@@ -131,6 +132,44 @@ class ApmTest extends TestCase
         $span = Apm::newSpan('span-type', 'span-name');
 
         $this->assertSame($t->id(), $span->parentId());
+        $this->assertSame('span-type', $span->type());
+        $this->assertSame('span-name', $span->name());
+    }
+
+    public function test_new_custom_span()
+    {
+        Apm::init('some-token', 'my-service');
+        $t = Apm::startJob('some-job');
+        $span = Apm::newCustomSpan('span-name');
+        $this->assertSame(Span::TYPE_CUSTOM, $span->type());
+        $this->assertSame('span-name', $span->name());
+    }
+
+    public function test_new_database_span()
+    {
+        Apm::init('some-token', 'my-service');
+        $t = Apm::startJob('some-job');
+        $span = Apm::newDatabaseSpan('span-name');
+        $this->assertSame(Span::TYPE_DATABASE, $span->type());
+        $this->assertSame('span-name', $span->name());
+    }
+
+    public function test_new_cache_span()
+    {
+        Apm::init('some-token', 'my-service');
+        $t = Apm::startJob('some-job');
+        $span = Apm::newCacheSpan('span-name');
+        $this->assertSame(Span::TYPE_CACHE, $span->type());
+        $this->assertSame('span-name', $span->name());
+    }
+
+    public function test_new_filesystem_span()
+    {
+        Apm::init('some-token', 'my-service');
+        $t = Apm::startJob('some-job');
+        $span = Apm::newFilesystemSpan('span-name');
+        $this->assertSame(Span::TYPE_FILESYSTEM, $span->type());
+        $this->assertSame('span-name', $span->name());
     }
 
     public function test_service_metadata_for_transaction()

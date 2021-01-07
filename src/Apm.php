@@ -125,6 +125,38 @@ class Apm
     }
 
     /**
+     * Create new "custom" type span for current transaction
+     */
+    public static function newCustomSpan(string $name): Span
+    {
+        return self::get()->transaction()->newCustomSpan($name);
+    }
+
+    /**
+     * Create new "database" type span for current transaction
+     */
+    public static function newDatabaseSpan(string $name): Span
+    {
+        return self::get()->transaction()->newDatabaseSpan($name);
+    }
+
+    /**
+     * Create new "cache" type span for current transaction
+     */
+    public static function newCacheSpan(string $name): Span
+    {
+        return self::get()->transaction()->newCacheSpan($name);
+    }
+
+    /**
+     * Create new "filesystem" type span for current transaction
+     */
+    public static function newFilesystemSpan(string $name): Span
+    {
+        return self::get()->transaction()->newFilesystemSpan($name);
+    }
+
+    /**
      * Service metadata for transaction
      */
     public static function service(): Service

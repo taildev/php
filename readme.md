@@ -37,11 +37,20 @@ register_shutdown_function(function () {
 
 Alternatively you can use `startJob($name)` for background jobs, CLI commands, etc. or `startCustom($name)`
 
-To add custom spans to the transaction
+To add spans to the transaction
 ```php
-$span = Apm::newSpan('fetch-config');
+$span = Apm::newDatabaseSpan('fetch-config');
 // ... code fetching config
 $span->finish();
+```
+
+Span "types" are used to categorize operations.
+```php
+Apm::newSpan(string $type, string $name); // to use your own custom type
+Apm::newCustomSpan($name); // type = "custom"
+Apm::newDatabaseSpan($name); // type = "database"
+Apm::newCacheSpan($name); // type = "cache"
+Apm::newFilesystemSpan($name); // type = "filesystem"
 ```
 
 #### Logs
