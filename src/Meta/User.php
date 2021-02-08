@@ -1,6 +1,6 @@
 <?php
 
-namespace Tail\Apm\Meta;
+namespace Tail\Meta;
 
 class User
 {

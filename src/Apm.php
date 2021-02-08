@@ -3,73 +3,46 @@
 namespace Tail;
 
 use Tail\Apm\Span;
-use Tail\Apm\Meta\User;
-use Tail\Apm\Meta\Tags;
-use Tail\Apm\Meta\Http;
+use Tail\Meta\User;
+use Tail\Meta\Tags;
+use Tail\Meta\Http;
+use Tail\Meta\System;
+use Tail\Meta\Service;
 use Tail\Apm\Support\Id;
-use Tail\Apm\Meta\System;
 use Tail\Apm\Transaction;
-use Tail\Apm\Meta\Service;
-use Tail\Apm\Exceptions\ApmConfigException;
 
 class Apm
 {
 
-    /** @var string Name to identify service */
-    protected $serviceName;
-
-    /** @var string Name of environment service is running in */
-    protected $environment;
-
-    /** @var Transaction */
-    protected $transaction;
-
-    /** @var Client */
-    protected $client;
-
-    /** @var Apm */
-    protected static $instance;
+    /** @var Transaction|null */
+    protected static $t;
 
     /**
-     * Initialize tracer, should be called at the very beginning
+     * Remove the current transaction
      */
-    public static function init(string $token, string $serviceName, ?string $environment = null): Apm
+    public static function reset()
     {
-        self::$instance = new Apm($token, $serviceName, $environment);
-        return self::$instance;
+        static::$t = null;
     }
 
     /**
-     * Get initialized Apm instance. Will throw an error if the tracer has not been initialized first.
+     * Get the root transaction. A new transaction will be created if one has not been started yet.
      */
-    public static function get(): Apm
+    public static function transaction(): Transaction
     {
-        if (!self::$instance) {
-            throw new ApmConfigException('Apm has not been initialized, try calling Apm::init first');
+        if (!static::$t) {
+            static::start();
         }
 
-        return self::$instance;
+        return static::$t;
     }
 
     /**
-     * Manually set the APM instance
+     * Start a new transaction (tracing a request). WARNING, this will overwrite an existing transaction.
      */
-    public static function replaceInstance(Apm $apm)
+    public static function start(): Transaction
     {
-        self::$instance = $apm;
-    }
-
-    /**
-     * Determine if APM is both initialized AND started a transaction
-     */
-    public static function running(): bool
-    {
-        try {
-            self::get()->transaction();
-            return true;
-        } catch (ApmConfigException $e) {
-            return false;
-        }
+        return static::startRequest();
     }
 
     /**
@@ -77,183 +50,9 @@ class Apm
      */
     public static function startRequest(?string $method = null, ?string $url = null): Transaction
     {
-        return self::get()->startRequestTransaction($method, $url);
-    }
-
-    /**
-     * Start a new transaction that traces a job. WARNING, this will overwrite an existing transaction.
-     */
-    public static function startJob(string $name): Transaction
-    {
-        return self::get()->startJobTransaction($name);
-    }
-
-    /**
-     * Start a new transaction that traces a custom type. WARNING, this will overwrite an existing transaction.
-     */
-    public static function startCustom(string $type, ?string $name = null): Transaction
-    {
-        return self::get()->startCustomTransaction($type, $name);
-    }
-
-    /**
-     * Set start time for transaction.
-     *
-     * @param float $time Unix timestamp in milliseconds
-     */
-    public static function setStartTime(float $time)
-    {
-        self::get()->transaction()->setStartTime($time);
-    }
-
-    /**
-     * Set end time for transaction.
-     *
-     * @param float $time Unix timestamp in milliseconds
-     */
-    public static function setEndTime(?float $time)
-    {
-        self::get()->transaction()->setEndTime($time);
-    }
-
-    /**
-     * Create new span for current transaction
-     */
-    public static function newSpan(string $type, string $name): Span
-    {
-        return self::get()->transaction()->newSpan($type, $name);
-    }
-
-    /**
-     * Create new "custom" type span for current transaction
-     */
-    public static function newCustomSpan(string $name): Span
-    {
-        return self::get()->transaction()->newCustomSpan($name);
-    }
-
-    /**
-     * Create new "database" type span for current transaction
-     */
-    public static function newDatabaseSpan(string $name): Span
-    {
-        return self::get()->transaction()->newDatabaseSpan($name);
-    }
-
-    /**
-     * Create new "cache" type span for current transaction
-     */
-    public static function newCacheSpan(string $name): Span
-    {
-        return self::get()->transaction()->newCacheSpan($name);
-    }
-
-    /**
-     * Create new "filesystem" type span for current transaction
-     */
-    public static function newFilesystemSpan(string $name): Span
-    {
-        return self::get()->transaction()->newFilesystemSpan($name);
-    }
-
-    /**
-     * Service metadata for transaction
-     */
-    public static function service(): Service
-    {
-        return self::get()->transaction()->service();
-    }
-
-    /**
-     * System metadata for transaction
-     */
-    public static function system(): System
-    {
-        return self::get()->transaction()->system();
-    }
-
-    /**
-     * HTTP metadata for transaction
-     */
-    public static function http(): Http
-    {
-        return self::get()->transaction()->http();
-    }
-
-    /**
-     * User metadata for transaction
-     */
-    public static function user(): User
-    {
-        return self::get()->transaction()->user();
-    }
-
-    /**
-     * Custom metadata for transaction
-     */
-    public static function tags(): Tags
-    {
-        return self::get()->transaction()->tags();
-    }
-
-    /**
-     * Finish transaction and spans that have not been marked as finished yet, and send all to the tracing service API.
-     */
-    public static function finish(): Apm
-    {
-        return self::get()->finishAndSend();
-    }
-
-    /**
-     * Remove the initialized tracing instance
-     */
-    public static function reset()
-    {
-        self::$instance = null;
-    }
-
-    public function __construct(string $token, string $serviceName, ?string $environment = null, ?Client $client = null)
-    {
-        $this->serviceName = $serviceName;
-        $this->environment = $environment;
-
-        $this->client = $client ?: new Client($token);
-    }
-
-    /**
-     * Get the transaction for the tracer. If no transaction has been started yet, an error is thrown.
-     */
-    public function transaction(): Transaction
-    {
-        if (!$this->transaction) {
-            throw new ApmConfigException('Transaction has not been started yet');
-        }
-
-        return $this->transaction;
-    }
-
-    /**
-     * Set the client
-     */
-    public function setClient(Client $client): Apm
-    {
-        $this->client = $client;
-        return $this;
-    }
-
-    /**
-     * Get the HTTP client
-     */
-    public function client(): Client
-    {
-        return $this->client;
-    }
-
-    public function startRequestTransaction(?string $method = null, ?string $url = null): Transaction
-    {
         $id = Id::generate();
         $type = Transaction::TYPE_REQUEST;
-        $t = new Transaction($id, $type, null, $this->serviceName, $this->environment);
+        $t = new Transaction($id, $type, null);
 
         if ($method) {
             $t->http()->setMethod($method);
@@ -267,34 +66,138 @@ class Apm
             $name = "Request";
         }
         $t->setName($name);
+        static::$t = $t;
 
-        return $this->transaction = $t;
+        return static::$t;
     }
 
-    public function startJobTransaction(?string $name = null): Transaction
+    /**
+     * Start a new transaction that traces a job. WARNING, this will overwrite an existing transaction.
+     */
+    public static function startJob(string $name): Transaction
     {
         $id = Id::generate();
         $type = Transaction::TYPE_JOB;
 
-        $t = new Transaction($id, $type, $name, $this->serviceName, $this->environment);
-        $this->transaction = $t;
+        $t = new Transaction($id, $type, $name);
+        static::$t = $t;
 
-        return $t;
+        return static::$t;
     }
 
-    public function startCustomTransaction(string $type, ?string $name = null): Transaction
+    /**
+     * Start a new transaction that traces a custom type. WARNING, this will overwrite an existing transaction.
+     */
+    public static function startCustom(string $type, ?string $name = null): Transaction
     {
         $id = Id::generate();
 
-        $t = new Transaction($id, $type, $name, $this->serviceName, $this->environment);
-        $this->transaction = $t;
+        $t = new Transaction($id, $type, $name);
+        static::$t = $t;
 
-        return $t;
+        return static::$t;
     }
 
-    public function finishAndSend(): Apm
+    /**
+     * Set start time for transaction. If a transaction has not started yet a new one will be created.
+     *
+     * @param float $time Unix timestamp in milliseconds
+     */
+    public static function setStartTime(float $time)
     {
-        $t = $this->transaction();
+        static::transaction()->setStartTime($time);
+    }
+
+    /**
+     * Set end time for transaction. If a transaction has not started yet a new one will be created.
+     *
+     * @param float $time Unix timestamp in milliseconds
+     */
+    public static function setEndTime(?float $time)
+    {
+        static::transaction()->setEndTime($time);
+    }
+
+    /**
+     * Create new span for current transaction. If a transaction has not started yet a new one will be created.
+     */
+    public static function newSpan(string $type, string $name): Span
+    {
+        return static::transaction()->newSpan($type, $name);
+    }
+
+    /**
+     * Create new "database" type span for current transaction. If a transaction has not started yet a new one will be created.
+     */
+    public static function newDatabaseSpan(string $name): Span
+    {
+        return static::transaction()->newDatabaseSpan($name);
+    }
+
+    /**
+     * Create new "cache" type span for current transaction. If a transaction has not started yet a new one will be created.
+     */
+    public static function newCacheSpan(string $name): Span
+    {
+        return static::transaction()->newCacheSpan($name);
+    }
+
+    /**
+     * Create new "filesystem" type span for current transaction. If a transaction has not started yet a new one will be created.
+     */
+    public static function newFilesystemSpan(string $name): Span
+    {
+        return static::transaction()->newFilesystemSpan($name);
+    }
+
+    /**
+     * Service metadata for transaction. If a transaction has not started yet a new one will be created.
+     */
+    public static function service(): Service
+    {
+        return static::transaction()->service();
+    }
+
+    /**
+     * System metadata for transaction. If a transaction has not started yet a new one will be created.
+     */
+    public static function system(): System
+    {
+        return static::transaction()->system();
+    }
+
+    /**
+     * HTTP metadata for transaction. If a transaction has not started yet a new one will be created.
+     */
+    public static function http(): Http
+    {
+        return static::transaction()->http();
+    }
+
+    /**
+     * User metadata for transaction. If a transaction has not started yet a new one will be created.
+     */
+    public static function user(): User
+    {
+        return static::transaction()->user();
+    }
+
+    /**
+     * Custom metadata for transaction. If a transaction has not started yet a new one will be created.
+     */
+    public static function tags(): Tags
+    {
+        return static::transaction()->tags();
+    }
+
+    /**
+     * Finish transaction and spans that have not been marked as finished yet, and send all to the tracing service API. 
+     * After sending the existing transaction will be cleared. If no trasnaction has started yet this method will simply return.
+     */
+    public static function finish()
+    {
+        $t = static::transaction();
+        if (!$t) return;
 
         if ($t->endTime() === null) {
             $t->finish();
@@ -306,9 +209,7 @@ class Apm
             }
         }
 
-        $this->client->sendApm($this->transaction->toArray());
-        $this->transaction = null;
-
-        return $this;
+        Tail::client()->sendApm($t->toArray());
+        static::$t = null;
     }
 }

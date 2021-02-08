@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Apm\Meta;
+namespace Tests\Meta;
 
 use Tests\TestCase;
-use Tail\Apm\Meta\System;
+use Tail\Meta\System;
 
 class SystemTest extends TestCase
 {

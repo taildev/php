@@ -21,8 +21,6 @@ class TransactionTest extends TestCase
             'id-123',
             Transaction::TYPE_REQUEST,
             'some-transaction',
-            'my-service',
-            'prod'
         );
     }
 
@@ -95,13 +93,12 @@ class TransactionTest extends TestCase
         $this->assertSame('id-123', $this->transaction->id());
         $this->assertSame(Transaction::TYPE_REQUEST, $this->transaction->type());
         $this->assertSame('some-transaction', $this->transaction->name());
-        $this->assertSame('my-service', $this->transaction->service()->name());
-        $this->assertSame('prod', $this->transaction->service()->environment());
 
         $this->assertNull($this->transaction->endTime());
         $expectedStart = Timestamp::nowInMs();
         $this->assertEqualsWithDelta($expectedStart, $this->transaction->startTime(), 50);
 
+        $this->assertNotEmpty($this->transaction->service());
         $this->assertNotEmpty($this->transaction->agent());
         $this->assertNotEmpty($this->transaction->http());
         $this->assertNotEmpty($this->transaction->system());

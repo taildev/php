@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Apm\Meta;
+namespace Tests\Meta;
 
 use Tests\TestCase;
-use Tail\Apm\Meta\Agent;
+use Tail\Meta\Agent;
 
 class AgentTest extends TestCase
 {
@@ -12,7 +12,7 @@ class AgentTest extends TestCase
 
     public function test_create_default()
     {
-        $agent = Agent::createDefault();
+        $agent = new Agent();
         $this->assertSame('tail-php', $agent->name());
         $this->assertSame('php', $agent->type());
         $this->assertNotEmpty($agent->version());
@@ -34,7 +34,7 @@ class AgentTest extends TestCase
 
     public function test_output_to_array()
     {
-        $agent = Agent::createDefault();
+        $agent = new Agent();
 
         $this->assertSame('tail-php', $agent->toArray()['name']);
         $this->assertSame('php', $agent->toArray()['type']);

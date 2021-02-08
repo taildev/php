@@ -19,7 +19,7 @@ class Client
 
     protected $apmSendHandlers = [];
 
-    public function __construct(string $token, ?Guzzle $guzzle = null)
+    public function __construct($token, ?Guzzle $guzzle = null)
     {
         $this->token = $token;
         $this->guzzle = $guzzle ?? new Guzzle();
@@ -57,7 +57,13 @@ class Client
         }
     }
 
+    // @todo remove
     public function getToken()
+    {
+        return $this->token;
+    }
+
+    public function token()
     {
         return $this->token;
     }

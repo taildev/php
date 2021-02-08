@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Apm\Meta;
+namespace Tests\Meta;
 
 use Tests\TestCase;
-use Tail\Apm\Meta\Tags;
+use Tail\Meta\Tags;
 
 class TagsTest extends TestCase
 {

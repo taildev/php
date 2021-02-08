@@ -4,80 +4,39 @@ namespace Tests;
 
 use Mockery;
 use Tail\Apm;
+use Tail\Tail;
 use Tail\Client;
-use Tail\Apm\Transaction;
-use Tail\Apm\Exceptions\ApmConfigException;
 use Tail\Apm\Span;
+use Tail\Apm\Transaction;
 
 class ApmTest extends TestCase
 {
 
-    public function test_constructs_with_properties()
-    {
-        $apm = new Apm('some-token', 'my-service', 'production');
-        $this->assertNotEmpty($apm->client());
-        $this->assertSame('some-token', $apm->client()->getToken());
-    }
-
-    public function test_apm_init()
-    {
-        $apm = Apm::init('some-token', 'my-service', 'production');
-        $this->assertSame($apm, Apm::get());
-    }
-
-    public function test_apm_get_throws_error_if_uninitialized()
+    public function test_getting_a_transaction_starts_a_new_one_if_not_already_started()
     {
         Apm::reset();
-        $this->expectException(ApmConfigException::class);
-        $this->expectExceptionMessage('Apm has not been initialized, try calling Apm::init first');
-        Apm::get();
+        $this->assertNotNull(Apm::transaction());
     }
 
-    public function test_replace_apm_instance()
+    public function test_start_a_transaction_starts_a_request_transaction()
     {
-        $apm1 = Apm::init('some-token', 'my-service', 'production');
-        $apm2 = new Apm('foo-123', 'another-service');
-        Apm::replaceInstance($apm2);
-        $this->assertNotSame($apm1, Apm::get());
-    }
-
-    public function test_determines_if_transaction_has_started()
-    {
-        $this->assertFalse(Apm::running());
-
-        // After init, still false until transaction is running
-        Apm::init('some-token', 'my-service');
-        $this->assertFalse(Apm::running());
-
-        Apm::startCustom('foo');
-        $this->assertTrue(Apm::running());
-    }
-
-    public function test_transaction_thats_not_started_throws_an_exception()
-    {
-        $this->expectException(ApmConfigException::class);
-        $this->expectExceptionMessage('Transaction has not been started yet');
-        $apm = new Apm('some-token', 'my-service', 'production');
-        $apm->transaction();
+        $t = Apm::start();
+        $this->assertSame(Transaction::TYPE_REQUEST, $t->type());
     }
 
     public function test_start_request_transaction()
     {
-        Apm::init('some-token', 'my-service', 'production');
         $t = Apm::startRequest('get', '/foo');
         $this->assertNotEmpty($t->id());
         $this->assertSame(Transaction::TYPE_REQUEST, $t->type());
         $this->assertSame('GET /foo', $t->name());
         $this->assertSame('GET', $t->http()->method());
         $this->assertSame('/foo', $t->http()->url());
-        $this->assertSame('my-service', $t->service()->name());
-        $this->assertSame('production', $t->service()->environment());
-        $this->assertSame($t, Apm::get()->transaction());
+        $this->assertSame($t, Apm::transaction());
     }
 
     public function test_start_request_uses_fallback_name_if_no_method_or_url_found()
     {
-        Apm::init('some-token', 'my-service', 'production');
         $_SERVER['REQUEST_URI'] = '';
         $_SERVER['REQUEST_METHOD'] = '';
         $t = Apm::startRequest();
@@ -86,48 +45,38 @@ class ApmTest extends TestCase
 
     public function test_start_job_transaction()
     {
-        Apm::init('some-token', 'my-service', 'production');
         $t = Apm::startJob('my-job');
         $this->assertNotEmpty($t->id());
         $this->assertSame(Transaction::TYPE_JOB, $t->type());
         $this->assertSame('my-job', $t->name());
-        $this->assertSame('my-service', $t->service()->name());
-        $this->assertSame('production', $t->service()->environment());
-        $this->assertSame($t, Apm::get()->transaction());
+        $this->assertSame($t, Apm::transaction());
     }
 
     public function test_start_custom_transaction()
     {
-        Apm::init('some-token', 'my-service', 'production');
         $t = Apm::startCustom('my-type', 'my-transaction');
         $this->assertNotEmpty($t->id());
         $this->assertSame('my-type', $t->type());
         $this->assertSame('my-transaction', $t->name());
-        $this->assertSame('my-service', $t->service()->name());
-        $this->assertSame('production', $t->service()->environment());
-        $this->assertSame($t, Apm::get()->transaction());
+        $this->assertSame($t, Apm::transaction());
     }
 
     public function test_set_start_time_sets_transactions_start_time()
     {
-        Apm::init('some-token', 'my-service', 'production');
         Apm::startCustom('foo');
         Apm::setStartTime(123.456);
-        $this->assertSame(123.456, Apm::get()->transaction()->startTime());
+        $this->assertSame(123.456, Apm::transaction()->startTime());
     }
 
     public function test_set_end_time_sets_transactions_end_time()
     {
-        Apm::init('some-token', 'my-service', 'production');
         Apm::startCustom('foo');
         Apm::setEndTime(123.456);
-        $this->assertSame(123.456, Apm::get()->transaction()->endTime());
+        $this->assertSame(123.456, Apm::transaction()->endTime());
     }
 
     public function test_new_span_creates_new_span_for_transaction()
     {
-        Apm::init('some-token', 'my-service');
-
         $t = Apm::startJob('some-job');
         $span = Apm::newSpan('span-type', 'span-name');
 
@@ -136,19 +85,9 @@ class ApmTest extends TestCase
         $this->assertSame('span-name', $span->name());
     }
 
-    public function test_new_custom_span()
-    {
-        Apm::init('some-token', 'my-service');
-        $t = Apm::startJob('some-job');
-        $span = Apm::newCustomSpan('span-name');
-        $this->assertSame(Span::TYPE_CUSTOM, $span->type());
-        $this->assertSame('span-name', $span->name());
-    }
-
     public function test_new_database_span()
     {
-        Apm::init('some-token', 'my-service');
-        $t = Apm::startJob('some-job');
+        Apm::startJob('some-job');
         $span = Apm::newDatabaseSpan('span-name');
         $this->assertSame(Span::TYPE_DATABASE, $span->type());
         $this->assertSame('span-name', $span->name());
@@ -156,8 +95,7 @@ class ApmTest extends TestCase
 
     public function test_new_cache_span()
     {
-        Apm::init('some-token', 'my-service');
-        $t = Apm::startJob('some-job');
+        Apm::startJob('some-job');
         $span = Apm::newCacheSpan('span-name');
         $this->assertSame(Span::TYPE_CACHE, $span->type());
         $this->assertSame('span-name', $span->name());
@@ -165,8 +103,7 @@ class ApmTest extends TestCase
 
     public function test_new_filesystem_span()
     {
-        Apm::init('some-token', 'my-service');
-        $t = Apm::startJob('some-job');
+        Apm::startJob('some-job');
         $span = Apm::newFilesystemSpan('span-name');
         $this->assertSame(Span::TYPE_FILESYSTEM, $span->type());
         $this->assertSame('span-name', $span->name());
@@ -174,8 +111,6 @@ class ApmTest extends TestCase
 
     public function test_service_metadata_for_transaction()
     {
-        Apm::init('some-token', 'my-service');
-
         $t = Apm::startJob('foo');
         $service = Apm::service();
 
@@ -184,8 +119,6 @@ class ApmTest extends TestCase
 
     public function test_http_metadata_for_transaction()
     {
-        Apm::init('some-token', 'my-service');
-
         $t = Apm::startJob('foo');
         $http = Apm::http();
 
@@ -194,8 +127,6 @@ class ApmTest extends TestCase
 
     public function test_system_metadata_for_transaction()
     {
-        Apm::init('some-token', 'my-service');
-
         $t = Apm::startJob('foo');
         $system = Apm::system();
 
@@ -204,8 +135,6 @@ class ApmTest extends TestCase
 
     public function test_tag_metadata_for_transaction()
     {
-        Apm::init('some-token', 'my-service');
-
         $t = Apm::startJob('foo');
         $tags = Apm::tags();
 
@@ -214,8 +143,6 @@ class ApmTest extends TestCase
 
     public function test_user_metadata_for_transaction()
     {
-        Apm::init('some-token', 'my-service');
-
         $t = Apm::startJob('foo');
         $user = Apm::user();
 
@@ -224,30 +151,28 @@ class ApmTest extends TestCase
 
     public function test_finish_and_send_to_api()
     {
+        Tail::init();
         $client = Mockery::mock(Client::class);
-        $apm = Apm::init('some-token', 'my-service', 'production');
-        $apm->setClient($client);
+        Tail::setClient($client);
 
         Apm::startRequest('GET', '/foo');
 
-        $t = Apm::get()->transaction();
+        $t = Apm::transaction();
         $t->finish();
         $client->shouldReceive('sendApm')->with($t->toArray());
 
         Apm::finish();
 
-        // transaction should be cleared
-        $this->expectException(ApmConfigException::class);
-        Apm::get()->transaction();
+        // Transaction should have been cleared
+        $this->assertNotSame($t, Apm::transaction());
     }
 
-    public function test_finish_and_send_sets_the_finish_time_for_transaction_if_not_set()
+    public function test_finish_sets_the_finish_time_for_transaction_if_not_set()
     {
+        Tail::init();
         $client = Mockery::mock(Client::class);
         $client->shouldReceive('sendApm');
-
-        $apm = Apm::init('some-token', 'my-service', 'production');
-        $apm->setClient($client);
+        Tail::setClient($client);
 
         $t = Apm::startRequest('GET', '/foo');
         Apm::finish();
@@ -257,11 +182,10 @@ class ApmTest extends TestCase
 
     public function test_finish_and_send_doesnt_change_transactions_finished_time_if_already_set()
     {
+        Tail::init();
         $client = Mockery::mock(Client::class);
         $client->shouldReceive('sendApm');
-
-        $apm = Apm::init('some-token', 'my-service', 'production');
-        $apm->setClient($client);
+        Tail::setClient($client);
 
         $t = Apm::startRequest('GET', '/foo');
         $t->finish();
@@ -275,11 +199,10 @@ class ApmTest extends TestCase
 
     public function test_finish_and_spend_sets_the_end_time_for_any_unfinished_spans()
     {
+        Tail::init();
         $client = Mockery::mock(Client::class);
         $client->shouldReceive('sendApm');
-
-        $apm = Apm::init('some-token', 'my-service', 'production');
-        $apm->setClient($client);
+        Tail::setClient($client);
 
         $t = Apm::startRequest('GET', '/foo');
 

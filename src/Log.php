@@ -3,100 +3,73 @@
 namespace Tail;
 
 use Carbon\Carbon;
-use Psr\Log\LoggerInterface;
+use Tail\Logs\LogMeta;
 
-class Log implements LoggerInterface
+class Log
 {
 
-    public static $instance;
+    protected static $meta;
 
-    /**
-     * Initialize a new logger instance
-     * 
-     * @param string $token Auth token for tail.dev
-     * @param string|null $serviceName Name of service being logged
-     * @param string|null $serviceEnvironment Environment of service being logged
-     * @return Log
-     */
-    public static function init(string $token, $serviceName = null, $serviceEnvironment = null)
+    public static $logs = [];
+
+    public static function meta()
     {
-        $client = new Client($token);
-        self::$instance = new Log($client, $serviceName, $serviceEnvironment);
+        if (!static::$meta) {
+            static::resetMeta();
+        }
 
-        register_shutdown_function([self::$instance, 'flush']);
-
-        return self::$instance;
+        return static::$meta;
     }
 
     /**
-     * Get logger instance. Be sure to call init() first.
-     * 
-     * @return Log|null 
+     * Clears all existing metadata
      */
-    public static function get()
+    public static function resetMeta()
     {
-        return self::$instance;
+        self::$meta = new LogMeta();
     }
 
-    /** @var Client */
-    protected $client;
-
-    /** @var string|null */
-    protected $serviceName;
-
-    /** @var string|null */
-    protected $serviceEnvironment;
-
-    protected $logs = [];
-
-    public function __construct(Client $client, $serviceName = null, $serviceEnvironment = null)
+    public static function emergency($message, array $context = [])
     {
-        $this->client = $client;
-        $this->serviceName = $serviceName;
-        $this->serviceEnvironment = $serviceEnvironment;
+        static::log(__FUNCTION__, $message, $context);
     }
 
-    public function emergency($message, array $context = [])
+    public static function alert($message, array $context = [])
     {
-        $this->log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $context);
     }
 
-    public function alert($message, array $context = [])
+    public static function critical($message, array $context = [])
     {
-        $this->log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $context);
     }
 
-    public function critical($message, array $context = [])
+    public static function error($message, array $context = [])
     {
-        $this->log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $context);
     }
 
-    public function error($message, array $context = [])
+    public static function warning($message, array $context = [])
     {
-        $this->log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $context);
     }
 
-    public function warning($message, array $context = [])
+    public static function notice($message, array $context = [])
     {
-        $this->log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $context);
     }
 
-    public function notice($message, array $context = [])
+    public static function info($message, array $context = [])
     {
-        $this->log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $context);
     }
 
-    public function info($message, array $context = [])
+    public static function debug($message, array $context = [])
     {
-        $this->log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $context);
     }
 
-    public function debug($message, array $context = [])
-    {
-        $this->log(__FUNCTION__, $message, $context);
-    }
-
-    public function log($level, $message, array $context = [])
+    public static function log($level, $message, array $context = [])
     {
         $log = [
             'level' => $level,
@@ -105,64 +78,38 @@ class Log implements LoggerInterface
             'time' => Carbon::now()->toIso8601String(),
         ];
 
-        if (! is_null($this->serviceName)) {
-            $log['service_name'] = $this->serviceName;
-        }
-
-        if (! is_null($this->serviceEnvironment)) {
-            $log['service_environment'] = $this->serviceEnvironment;
-        }
-
-        $this->logs[] = $log;
-    }
-
-    public function getLogs(): array
-    {
-        return $this->logs;
-    }
-
-    public function setServiceName(?string $name)
-    {
-        $this->serviceName = $name;
-    }
-
-    public function getServiceName()
-    {
-        return $this->serviceName;
-    }
-
-    public function setServiceEnvironment(?string $env)
-    {
-        $this->serviceEnvironment = $env;
-    }
-
-    public function getServiceEnvironment()
-    {
-        return $this->serviceEnvironment;
-    }
-
-    /**
-     * Get tail.dev client
-     * 
-     * @return Client 
-     */
-    public function getClient()
-    {
-        return $this->client;
+        static::$logs[] = $log;
     }
 
     /**
      * Flush will send and then delete any existing logs
      */
-    public function flush()
+    public static function flush()
     {
-        $logs = $this->getLogs();
-        if (count($logs) === 0) {
+        if (count(static::$logs) === 0) {
             return;
         }
 
-        $this->client->sendLogs($logs);
+        $logs = static::logsWithMetadata();
+        if (Tail::logsEnabled()) {
+            Tail::client()->sendLogs($logs);
+        }
 
-        $this->logs = [];
+        static::$logs = [];
+    }
+
+    protected static function logsWithMetadata()
+    {
+        if (!static::meta()->service()->name()) {
+            static::meta()->service()->setName(Tail::service());
+        }
+
+        if (!static::meta()->service()->environment()) {
+            static::meta()->service()->setEnvironment(Tail::environment());
+        }
+
+        return array_map(function ($log) {
+            return array_merge($log, static::meta()->toArray());
+        }, static::$logs);
     }
 }

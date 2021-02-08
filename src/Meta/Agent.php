@@ -1,6 +1,6 @@
 <?php
 
-namespace Tail\Apm\Meta;
+namespace Tail\Meta;
 
 class Agent
 {
@@ -14,17 +14,13 @@ class Agent
     /** @var ?string Agent version */
     protected $version;
 
-    /**
-     * Default Agent metadata
-     */
-    public static function createDefault(): Agent
+    public function __construct()
     {
-        $agent = new Agent();
-        $agent->setName('tail-php');
-        $agent->setType('php');
+        $this->setName('tail-php');
+        $this->setType('php');
 
         $version = 'unknown';
-        $composerFilepath = __DIR__ . '/../../../../../../composer.lock';
+        $composerFilepath = __DIR__ . '/../../../../../composer.lock';
         if (file_exists($composerFilepath)) {
             $composerContent = file_get_contents($composerFilepath);
             $composer = json_decode($composerContent);
@@ -36,9 +32,7 @@ class Agent
             }
         }
 
-        $agent->setVersion($version);
-
-        return $agent;
+        $this->setVersion($version);
     }
 
     /**
@@ -63,16 +57,21 @@ class Agent
 
     /**
      * Get the name of the agent
+     * 
+     * @return string|null
      */
-    public function name(): ?string
+    public function name()
     {
         return $this->name;
     }
 
     /**
      * Set the name of the agent
+     * 
+     * @param string|null $name
+     * @return Agent
      */
-    public function setName(?string $name): Agent
+    public function setName($name)
     {
         $this->name = $name;
         return $this;
@@ -80,16 +79,21 @@ class Agent
 
     /**
      * Get the type of agent
+     * 
+     * @return string|null
      */
-    public function type(): ?string
+    public function type()
     {
         return $this->type;
     }
 
     /**
      * Set the type of agent
+     * 
+     * @param string|null $type
+     * @return Agent
      */
-    public function setType(?string $type): Agent
+    public function setType($type)
     {
         $this->type = $type;
         return $this;
@@ -97,16 +101,21 @@ class Agent
 
     /**
      * Get the version of the agent
+     * 
+     * @return string|null
      */
-    public function version(): ?string
+    public function version()
     {
         return $this->version;
     }
 
     /**
      * Set the version of the agent
+     * 
+     * @param string|null $version
+     * @return Agent
      */
-    public function setVersion(?string $version): Agent
+    public function setVersion($version)
     {
         $this->version = $version;
         return $this;
@@ -114,8 +123,10 @@ class Agent
 
     /**
      * Serialize meta information as an array
+     * 
+     * @return array
      */
-    public function toArray(): array
+    public function toArray()
     {
         return [
             'name' => $this->name(),

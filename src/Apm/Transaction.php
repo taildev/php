@@ -2,15 +2,14 @@
 
 namespace Tail\Apm;
 
-use Tail\Apm\Meta\User;
-use Tail\Apm\Meta\Tags;
-use Tail\Apm\Meta\Http;
+use Tail\Meta\User;
+use Tail\Meta\Tags;
+use Tail\Meta\Http;
+use Tail\Meta\Agent;
+use Tail\Meta\System;
+use Tail\Meta\Service;
 use Tail\Apm\Support\Id;
-use Tail\Apm\Meta\Agent;
-use Tail\Apm\Meta\System;
-use Tail\Apm\Meta\Service;
 use Tail\Apm\Support\Timestamp;
-use Tail\Apm\Exceptions\TransactionConfigException;
 
 class Transaction
 {
@@ -69,13 +68,14 @@ class Transaction
 
         # service properties
         $service = $properties['service'];
-        $serviceName = $service['name'];
+        $serviceName = array_key_exists('name', $service) ? $service['name'] : null;
         $environment = array_key_exists('environment', $service) ? $service['environment'] : null;
 
         # create transaction
-        $transaction = new Transaction($id, $type, $name, $serviceName);
+        $transaction = new Transaction($id, $type, $name);
         $transaction->setStartTime($startTime);
         $transaction->setEndTime($endTime);
+        $transaction->service()->setName($serviceName);
         $transaction->service()->setEnvironment($environment);
 
         # agent properties
@@ -111,18 +111,16 @@ class Transaction
     public function __construct(
         string $id,
         string $type,
-        ?string $name,
-        string $serviceName,
-        ?string $environment = null
+        ?string $name
     ) {
         $this->id = $id;
         $this->type = $type;
         $this->name = $name;
         $this->startTime = Timestamp::nowInMs();
 
-        $this->agent = Agent::createDefault();
+        $this->agent = new Agent();
         $this->http = new Http();
-        $this->service = new Service($serviceName, $environment);
+        $this->service = new Service();
         $this->system = new System();
         $this->tags = new Tags();
         $this->user = new User();

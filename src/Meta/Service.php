@@ -1,17 +1,17 @@
 <?php
 
-namespace Tail\Apm\Meta;
+namespace Tail\Meta;
 
 class Service
 {
 
-    /** @var string Name to identify service */
+    /** @var string|null Name to identify service */
     protected $name;
 
-    /** @var string Environment name service is running in */
+    /** @var string|null Environment name service is running in */
     protected $environment;
 
-    public function __construct(string $name, ?string $environment = null)
+    public function __construct(?string $name = null, ?string $environment = null)
     {
         $this->name = $name;
         $this->environment = $environment;
@@ -19,16 +19,20 @@ class Service
 
     /**
      * Get name of service
+     * 
+     * @return string|null
      */
-    public function name(): string
+    public function name()
     {
         return $this->name;
     }
 
     /**
      * Set the name of the service
+     * 
+     * @return Service
      */
-    public function setName(string $name): Service
+    public function setName(string $name)
     {
         $this->name = $name;
         return $this;
@@ -36,16 +40,20 @@ class Service
 
     /**
      * Get the name of the environment
+     * 
+     * @return string|null
      */
-    public function environment(): ?string
+    public function environment()
     {
         return $this->environment;
     }
 
     /**
      * Set the name of the environment
+     * 
+     * @return Service
      */
-    public function setEnvironment(?string $environment): Service
+    public function setEnvironment(?string $environment)
     {
         $this->environment = $environment;
         return $this;
@@ -53,8 +61,10 @@ class Service
 
     /**
      * Serialize meta information into an array
+     * 
+     * @return array
      */
-    public function toArray(): array
+    public function toArray()
     {
         return [
             'name' => $this->name(),

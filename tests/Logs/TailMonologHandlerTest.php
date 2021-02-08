@@ -4,23 +4,21 @@ namespace Tests\Logs;
 
 use Mockery;
 use Tail\Log;
+use Tail\Tail;
+use Tail\Client;
 use Tests\TestCase;
 use Tail\Logs\TailMonologHandler;
 
 class TailMonologHandlerTest extends TestCase
 {
 
-    /** @var Log|Mockery\Mock */
-    protected $log;
-
-    /** @var TailMonologHandler */
     protected $handler;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->log = Mockery::mock(Log::class);
-        $this->handler = new TailMonologHandler($this->log);
+        Log::$logs = [];
+        $this->handler = new TailMonologHandler();
     }
 
     public function test_write()
@@ -31,13 +29,21 @@ class TailMonologHandlerTest extends TestCase
             'context' => ['foo' => 'bar'],
         ];
 
-        $this->log->shouldReceive('log')->with('debug', 'some log message', ['foo' => 'bar'])->once();
         $this->handler->write($record);
+        $this->assertSame($record['message'], Log::$logs[0]['message']);
+        $this->assertSame($record['level_name'], Log::$logs[0]['level']);
+        $this->assertSame($record['context'], Log::$logs[0]['context']);
     }
 
     public function test_close()
     {
-        $this->log->shouldReceive('flush')->once();
+        Tail::init();
+        $client = Mockery::mock(Client::class);
+        $client->shouldReceive('sendLogs');
+        Tail::setClient($client);
+
+        $this->handler->write(['message' => 'some log message', 'level_name' => 'debug']);
         $this->handler->close();
+        $this->assertEmpty(Log::$logs);
     }
 }

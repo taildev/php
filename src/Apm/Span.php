@@ -2,8 +2,8 @@
 
 namespace Tail\Apm;
 
-use Tail\Apm\Meta\Tags;
-use Tail\Apm\Meta\Database;
+use Tail\Meta\Tags;
+use Tail\Meta\Database;
 use Tail\Apm\Support\Timestamp;
 
 class Span

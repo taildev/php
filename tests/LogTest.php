@@ -4,125 +4,180 @@ namespace Tests;
 
 use Mockery;
 use Tail\Log;
+use Tail\Tail;
 use Tail\Client;
 use Carbon\Carbon;
 
 class LogTest extends TestCase
 {
 
-    /** @var Log */
-    protected $log;
-
-    /** @var Client|Mockery\Mock */
-    protected $client;
-
     public function setUp(): void
     {
         parent::setUp();
-        $this->client = Mockery::mock(Client::class);
-        $this->log = new Log($this->client);
+        Tail::$initialized = false;
+        Log::$logs = [];
+        Log::resetMeta();
     }
 
-    public function test_init()
+    public function test_log_meta_returns_new_instance_of_meta()
     {
-        $logger = Log::init('secret_token', 'my_app', 'prod');
-        $this->assertSame($logger, Log::get());
-        $this->assertNotNull($logger->getClient());
-        $this->assertSame('secret_token', $logger->getClient()->getToken());
-        $this->assertSame('my_app', $logger->getServiceName());
-        $this->assertSame('prod', $logger->getServiceEnvironment());
+        $meta = Log::meta();
+        $this->assertNotNull($meta);
+        $this->assertSame($meta, Log::meta());
     }
 
     public function test_log_messages()
     {
-        $this->log->log('info', 'My info message', ['number' => 1]);
-        $this->log->log('debug', 'My debug message', ['number' => 2]);
+        Log::log('info', 'My info message', ['number' => 1]);
+        Log::log('debug', 'My debug message', ['number' => 2]);
 
-        $this->assertCount(2, $this->log->getLogs());
+        $this->assertCount(2, Log::$logs);
         $expectedTime = Carbon::now()->timestamp;
 
-        $log1 = $this->log->getLogs()[0];
+        $log1 = Log::$logs[0];
         $this->assertSame('info', $log1['level']);
         $this->assertSame('My info message', $log1['message']);
         $this->assertSame(['number' => 1], $log1['context']);
         $this->assertEqualsWithDelta($expectedTime, Carbon::parse($log1['time'])->timestamp, 1);
 
-        $log2 = $this->log->getLogs()[1];
+        $log2 = Log::$logs[1];
         $this->assertSame('debug', $log2['level']);
         $this->assertSame('My debug message', $log2['message']);
         $this->assertSame(['number' => 2], $log2['context']);
         $this->assertEqualsWithDelta($expectedTime, Carbon::parse($log2['time'])->timestamp, 1);
     }
 
-    public function test_log_message_appends_service_name_and_environment_when_present()
-    {
-        $this->log->setServiceName('my_app');
-        $this->log->setServiceEnvironment('dev');
-        $this->log->log('debug', 'some message');
-
-        $log = $this->log->getLogs()[0];
-        $this->assertSame('my_app', $log['service_name']);
-        $this->assertSame('dev', $log['service_environment']);
-    }
-
     public function test_flush_logs()
     {
-        $this->log->log('debug', 'my message');
+        Log::log('debug', 'my message');
 
-        $content = $this->log->getLogs();
-        $this->client->shouldReceive('sendLogs')->with($content)->once();
+        $client = Mockery::mock(Client::class);
+        $client->shouldReceive('sendLogs')->once();
+        Tail::init();
+        Tail::setClient($client);
 
-        $this->log->flush();
-        $this->assertCount(0, $this->log->getLogs());
+        Log::flush();
+        $this->assertCount(0, Log::$logs);
     }
 
     public function test_flush_logs_only_sends_messages_if_present()
     {
-        $this->client->shouldNotReceive('sendLogs');
-        $this->log->flush();
+        Tail::init();
+        $client = Mockery::mock(Client::class);
+        Tail::setClient($client);
+
+        $client->shouldNotReceive('sendLogs');
+        Log::flush();
+    }
+
+    public function test_flush_logs_doesnt_send_logs_if_logging_is_disabled()
+    {
+        Log::log('debug', 'my message');
+
+        Tail::init(['logs_enabled' => false]);
+        $client = Mockery::mock(Client::class);
+        Tail::setClient($client);
+
+        $client->shouldNotReceive('sendLogs');
+        Log::flush();
+    }
+
+    public function test_flush_logs_sets_tail_service_meta()
+    {
+        Log::log('debug', 'my message');
+
+        Tail::init(['logs_enabled' => false]);
+        $client = Mockery::mock(Client::class);
+        $client->shouldIgnoreMissing();
+        Tail::setClient($client);
+
+        $this->assertNull(Log::meta()->service()->name());
+        $this->assertNull(Log::meta()->service()->environment());
+
+        Log::flush();
+
+        $this->assertNotNull(Log::meta()->service()->name());
+        $this->assertNotNull(Log::meta()->service()->environment());
+    }
+
+    public function test_flush_logs_does_not_change_existing_service_metadata()
+    {
+        Log::log('debug', 'my message');
+
+        Tail::init(['logs_enabled' => false]);
+        $client = Mockery::mock(Client::class);
+        $client->shouldIgnoreMissing();
+        Tail::setClient($client);
+
+        Log::meta()->service()->setName('my-custom-name');
+        Log::meta()->service()->setEnvironment('my-custom-env');
+
+        Log::flush();
+
+        $this->assertSame('my-custom-name', Log::meta()->service()->name());
+        $this->assertSame('my-custom-env', Log::meta()->service()->environment());
+    }
+
+    public function test_flush_logs_attaches_metadata_to_each_record()
+    {
+        Log::debug('message 1');
+        Log::info('message 2');
+        Log::meta()->service()->setName('my-custom-name');
+        Log::meta()->service()->setEnvironment('my-custom-env');
+
+        $expected = array_map(function ($log) {
+            return array_merge($log, Log::meta()->toArray());
+        }, Log::$logs);
+
+        Tail::init();
+        $client = Mockery::mock(Client::class);
+        $client->shouldReceive('sendLogs')->with($expected)->once();
+        Tail::setClient($client);
+        
+        Log::flush();
     }
 
     public function test_log_via_level_handlers()
     {
-        $this->log->emergency('em', ['number' => 1]);
-        $this->log->alert('al', ['number' => 2]);
-        $this->log->critical('cr', ['number' => 3]);
-        $this->log->error('er', ['number' => 4]);
-        $this->log->warning('wa', ['number' => 5]);
-        $this->log->notice('no', ['number' => 6]);
-        $this->log->info('in', ['number' => 7]);
-        $this->log->debug('de', ['number' => 8]);
+        Log::emergency('em', ['number' => 1]);
+        Log::alert('al', ['number' => 2]);
+        Log::critical('cr', ['number' => 3]);
+        Log::error('er', ['number' => 4]);
+        Log::warning('wa', ['number' => 5]);
+        Log::notice('no', ['number' => 6]);
+        Log::info('in', ['number' => 7]);
+        Log::debug('de', ['number' => 8]);
 
-        $this->assertSame('emergency', $this->log->getLogs()[0]['level']);
-        $this->assertSame('em', $this->log->getLogs()[0]['message']);
-        $this->assertSame(['number' => 1], $this->log->getLogs()[0]['context']);
+        $this->assertSame('emergency', Log::$logs[0]['level']);
+        $this->assertSame('em', Log::$logs[0]['message']);
+        $this->assertSame(['number' => 1], Log::$logs[0]['context']);
 
-        $this->assertSame('alert', $this->log->getLogs()[1]['level']);
-        $this->assertSame('al', $this->log->getLogs()[1]['message']);
-        $this->assertSame(['number' => 2], $this->log->getLogs()[1]['context']);
+        $this->assertSame('alert', Log::$logs[1]['level']);
+        $this->assertSame('al', Log::$logs[1]['message']);
+        $this->assertSame(['number' => 2], Log::$logs[1]['context']);
 
-        $this->assertSame('critical', $this->log->getLogs()[2]['level']);
-        $this->assertSame('cr', $this->log->getLogs()[2]['message']);
-        $this->assertSame(['number' => 3], $this->log->getLogs()[2]['context']);
+        $this->assertSame('critical', Log::$logs[2]['level']);
+        $this->assertSame('cr', Log::$logs[2]['message']);
+        $this->assertSame(['number' => 3], Log::$logs[2]['context']);
 
-        $this->assertSame('error', $this->log->getLogs()[3]['level']);
-        $this->assertSame('er', $this->log->getLogs()[3]['message']);
-        $this->assertSame(['number' => 4], $this->log->getLogs()[3]['context']);
+        $this->assertSame('error', Log::$logs[3]['level']);
+        $this->assertSame('er', Log::$logs[3]['message']);
+        $this->assertSame(['number' => 4], Log::$logs[3]['context']);
 
-        $this->assertSame('warning', $this->log->getLogs()[4]['level']);
-        $this->assertSame('wa', $this->log->getLogs()[4]['message']);
-        $this->assertSame(['number' => 5], $this->log->getLogs()[4]['context']);
+        $this->assertSame('warning', Log::$logs[4]['level']);
+        $this->assertSame('wa', Log::$logs[4]['message']);
+        $this->assertSame(['number' => 5], Log::$logs[4]['context']);
 
-        $this->assertSame('notice', $this->log->getLogs()[5]['level']);
-        $this->assertSame('no', $this->log->getLogs()[5]['message']);
-        $this->assertSame(['number' => 6], $this->log->getLogs()[5]['context']);
+        $this->assertSame('notice', Log::$logs[5]['level']);
+        $this->assertSame('no', Log::$logs[5]['message']);
+        $this->assertSame(['number' => 6], Log::$logs[5]['context']);
 
-        $this->assertSame('info', $this->log->getLogs()[6]['level']);
-        $this->assertSame('in', $this->log->getLogs()[6]['message']);
-        $this->assertSame(['number' => 7], $this->log->getLogs()[6]['context']);
+        $this->assertSame('info', Log::$logs[6]['level']);
+        $this->assertSame('in', Log::$logs[6]['message']);
+        $this->assertSame(['number' => 7], Log::$logs[6]['context']);
 
-        $this->assertSame('debug', $this->log->getLogs()[7]['level']);
-        $this->assertSame('de', $this->log->getLogs()[7]['message']);
-        $this->assertSame(['number' => 8], $this->log->getLogs()[7]['context']);
+        $this->assertSame('debug', Log::$logs[7]['level']);
+        $this->assertSame('de', Log::$logs[7]['message']);
+        $this->assertSame(['number' => 8], Log::$logs[7]['context']);
     }
 }
