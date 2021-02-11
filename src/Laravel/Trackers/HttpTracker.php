@@ -14,7 +14,7 @@ class HttpTracker implements Tracker
 {
 
     /**
-     * @param Application $app 
+     * @param Application $app
      */
     public function register($app)
     {

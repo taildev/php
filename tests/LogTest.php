@@ -87,7 +87,7 @@ class LogTest extends TestCase
         $client = Mockery::mock(Client::class);
         $client->shouldReceive('sendLogs')->with($expected)->once();
         Tail::setClient($client);
-        
+
         Log::flush();
     }
 

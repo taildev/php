@@ -9,7 +9,6 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 class TestCase extends OrchestraTestCase
 {
-
     use MockeryPHPUnitIntegration;
 
     protected function getPackageProviders($app)

@@ -57,7 +57,7 @@ class Agent
 
     /**
      * Get the name of the agent
-     * 
+     *
      * @return string|null
      */
     public function name()
@@ -67,7 +67,7 @@ class Agent
 
     /**
      * Set the name of the agent
-     * 
+     *
      * @param string|null $name
      * @return Agent
      */
@@ -79,7 +79,7 @@ class Agent
 
     /**
      * Get the type of agent
-     * 
+     *
      * @return string|null
      */
     public function type()
@@ -89,7 +89,7 @@ class Agent
 
     /**
      * Set the type of agent
-     * 
+     *
      * @param string|null $type
      * @return Agent
      */
@@ -101,7 +101,7 @@ class Agent
 
     /**
      * Get the version of the agent
-     * 
+     *
      * @return string|null
      */
     public function version()
@@ -111,7 +111,7 @@ class Agent
 
     /**
      * Set the version of the agent
-     * 
+     *
      * @param string|null $version
      * @return Agent
      */
@@ -123,8 +123,8 @@ class Agent
 
     /**
      * Merge provided meta array. Any keys provided will overwrite existing metadata.
-     * 
-     * @param array $meta 
+     *
+     * @param array $meta
      * @return self
      */
     public function merge(array $meta)
@@ -146,7 +146,7 @@ class Agent
 
     /**
      * Serialize meta information as an array
-     * 
+     *
      * @return array
      */
     public function toArray()

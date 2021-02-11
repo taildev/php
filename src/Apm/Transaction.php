@@ -14,8 +14,8 @@ use Tail\Apm\Support\Timestamp;
 class Transaction
 {
 
-    const TYPE_REQUEST = 'request';
-    const TYPE_JOB = 'job';
+    public const TYPE_REQUEST = 'request';
+    public const TYPE_JOB = 'job';
 
     /** @var string Unique ID for transaction */
     protected $id;
@@ -310,7 +310,7 @@ class Transaction
 
         return $span;
     }
-    
+
     /**
      * Create a new "database" type child span for the transaction. If parentId is not provided, the transaction ID is used as the parent ID for the span.
      */

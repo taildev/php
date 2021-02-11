@@ -39,7 +39,9 @@ class FrameworkBootTracker implements Tracker
      */
     public function onFinishBoot($app)
     {
-        if (!$this->span) return;
+        if (!$this->span) {
+            return;
+        }
 
         $this->span->finish();
     }

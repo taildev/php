@@ -44,8 +44,8 @@ class System
 
     /**
      * Merge provided meta array. Any keys provided will overwrite existing metadata.
-     * 
-     * @param array $meta 
+     *
+     * @param array $meta
      * @return self
      */
     public function merge(array $meta)

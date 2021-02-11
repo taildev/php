@@ -127,8 +127,8 @@ class Tail
         return self::$client;
     }
 
-    /** 
-     * @return bool 
+    /**
+     * @return bool
      */
     public static function apmEnabled()
     {
@@ -139,8 +139,8 @@ class Tail
         return static::$apmEnabled;
     }
 
-    /** 
-     * @return bool 
+    /**
+     * @return bool
      */
     public static function logsEnabled()
     {
@@ -184,7 +184,7 @@ class Tail
     }
 
     /**
-     * @return TailMeta 
+     * @return TailMeta
      */
     public static function meta()
     {
@@ -231,7 +231,7 @@ class Tail
     {
         return static::meta()->system();
     }
-    
+
     /**
      * @return \Tail\Meta\Service
      */

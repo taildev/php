@@ -19,7 +19,7 @@ class Service
 
     /**
      * Get name of service
-     * 
+     *
      * @return string|null
      */
     public function name()
@@ -29,7 +29,7 @@ class Service
 
     /**
      * Set the name of the service
-     * 
+     *
      * @return Service
      */
     public function setName(string $name)
@@ -40,7 +40,7 @@ class Service
 
     /**
      * Get the name of the environment
-     * 
+     *
      * @return string|null
      */
     public function environment()
@@ -50,7 +50,7 @@ class Service
 
     /**
      * Set the name of the environment
-     * 
+     *
      * @return Service
      */
     public function setEnvironment(?string $environment)
@@ -61,8 +61,8 @@ class Service
 
     /**
      * Merge provided meta array. Any keys provided will overwrite existing metadata.
-     * 
-     * @param array $meta 
+     *
+     * @param array $meta
      * @return self
      */
     public function merge(array $meta)
@@ -80,7 +80,7 @@ class Service
 
     /**
      * Serialize meta information into an array
-     * 
+     *
      * @return array
      */
     public function toArray()

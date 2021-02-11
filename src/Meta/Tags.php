@@ -15,7 +15,7 @@ class Tags
 
     /**
      * Set custom tag value
-     * 
+     *
      * @param string $key
      * @param string $value
      * @return self
@@ -28,7 +28,7 @@ class Tags
 
     /**
      * Get tag value
-     * 
+     *
      * @param string $key
      * @return string|null
      */
@@ -43,7 +43,7 @@ class Tags
 
     /**
      * Replace all tags with the provided key=>value array
-     * 
+     *
      * @param array $tags
      * @return self
      */
@@ -55,7 +55,7 @@ class Tags
 
     /**
      * All custom set tags
-     * 
+     *
      * @return array
      */
     public function all()
@@ -65,9 +65,9 @@ class Tags
 
     /**
      * Merge provided meta array. Any keys provided will overwrite existing metadata.
-     * 
-     * @param array $tags 
-     * @return self 
+     *
+     * @param array $tags
+     * @return self
      */
     public function merge(array $tags)
     {
@@ -77,7 +77,7 @@ class Tags
 
     /**
      * Serialize meta information into an array
-     * 
+     *
      * @return array
      */
     public function toArray()

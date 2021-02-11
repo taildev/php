@@ -164,13 +164,15 @@ class Apm
     }
 
     /**
-     * Finish transaction and spans that have not been marked as finished yet, and send all to the tracing service API. 
+     * Finish transaction and spans that have not been marked as finished yet, and send all to the tracing service API.
      * After sending the existing transaction will be cleared. If no trasnaction has started yet this method will simply return.
      */
     public static function finish()
     {
         $t = static::transaction();
-        if (!$t) return;
+        if (!$t) {
+            return;
+        }
 
         static::mergeTransactionMetadata($t);
 

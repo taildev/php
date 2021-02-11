@@ -37,7 +37,7 @@ class TailMeta
 
     /**
      * Get/set agent metadata
-     * 
+     *
      * @return Agent
      */
     public function agent()
@@ -47,7 +47,7 @@ class TailMeta
 
     /**
      * Get/set service metadata
-     * 
+     *
      * @return Service
      */
     public function service()
@@ -57,7 +57,7 @@ class TailMeta
 
     /**
      * Get/set system metadata
-     * 
+     *
      * @return System
      */
     public function system()
@@ -67,7 +67,7 @@ class TailMeta
 
     /**
      * Get/set custom metadata
-     * 
+     *
      * @return Tags
      */
     public function tags()
@@ -77,7 +77,7 @@ class TailMeta
 
     /**
      * Get/set user metadata
-     * 
+     *
      * @return User
      */
     public function user()

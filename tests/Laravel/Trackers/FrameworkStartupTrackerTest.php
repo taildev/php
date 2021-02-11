@@ -22,7 +22,7 @@ class FrameworkStartupTrackerTest extends TestCase
     public function test_register_starts_a_span_and_listens_for_booting_to_start()
     {
         $expectedStart = 5000;
-        define('LARAVEL_START', $expectedStart/1000);
+        define('LARAVEL_START', $expectedStart / 1000);
 
         $app = Mockery::mock(Application::class);
         $app->shouldReceive('booting')->with(Mockery::any())->once();

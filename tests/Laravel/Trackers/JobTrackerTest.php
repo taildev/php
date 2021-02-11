@@ -24,7 +24,7 @@ class JobTrackerTest extends TestCase
 
     /** @var Mockery\Mock|Job */
     protected $job;
-    
+
     /** @var Mockery\Mock|Application|array */
     protected $app;
 

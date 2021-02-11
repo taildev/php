@@ -24,7 +24,7 @@ class JobTracker implements Tracker
     protected $spans = [];
 
     /**
-     * @param Application $app 
+     * @param Application $app
      */
     public function register($app)
     {
@@ -47,7 +47,9 @@ class JobTracker implements Tracker
         ];
 
         if ($this->isSyncDriver($event->connectionName)) {
-            if (!$job->getJobId()) return;
+            if (!$job->getJobId()) {
+                return;
+            }
             $span = Apm::newSpan($job->resolveName(), 'job');
             $span->tags()->replaceAll($jobTags);
             $this->spans[$job->getJobId()] = $span;
@@ -74,7 +76,9 @@ class JobTracker implements Tracker
         $job = $event->job;
 
         if ($this->isSyncDriver($event->connectionName) && $job->getJobId()) {
-            if (!$job->getJobId()) return;
+            if (!$job->getJobId()) {
+                return;
+            }
             $span = Arr::get($this->getSpans(), $job->getJobId());
             $this->finishSpan($span, 'failed');
         } else {
@@ -89,13 +93,13 @@ class JobTracker implements Tracker
 
     protected function isSyncDriver($connection)
     {
-        $driver = $this->app['config']->get('queue.connections.'.$connection.'.driver');
+        $driver = $this->app['config']->get('queue.connections.' . $connection . '.driver');
         return $driver === 'sync';
     }
 
     /**
-     * @param Span|null $span 
-     * @param string $status 
+     * @param Span|null $span
+     * @param string $status
      */
     protected function finishSpan($span, $status)
     {
@@ -108,7 +112,7 @@ class JobTracker implements Tracker
     }
 
     /**
-     * @param string $status 
+     * @param string $status
      */
     protected function finishTransaction($status)
     {

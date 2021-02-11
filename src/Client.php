@@ -7,8 +7,8 @@ use GuzzleHttp\Client as Guzzle;
 class Client
 {
 
-    const LOGS_ENDPOINT = 'https://api.tail.dev/ingest/logs';
-    const APM_ENDPOINT = 'https://api.tail.dev/ingest/transactions';
+    public const LOGS_ENDPOINT = 'https://api.tail.dev/ingest/logs';
+    public const APM_ENDPOINT = 'https://api.tail.dev/ingest/transactions';
 
     protected $token;
 

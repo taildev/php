@@ -30,7 +30,9 @@ class FrameworkStartupTracker implements Tracker
      */
     public function onStartBoot($app)
     {
-        if (!$this->span) return;
+        if (!$this->span) {
+            return;
+        }
 
         $this->span->finish();
     }

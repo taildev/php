@@ -57,7 +57,7 @@ class TailServiceProvider extends ServiceProvider
      * Transactions start as a custom type named '_ignore'. The transaction must be
      * initialized in order to capture spans so we create it early. Later in the process
      * when we determine if it's a request, job, etc. the type and name are updated accordingly.
-     * Otherwise if we make it to the end with the `_ignore` type we'll skip recording it. 
+     * Otherwise if we make it to the end with the `_ignore` type we'll skip recording it.
      */
     protected function startApm()
     {
