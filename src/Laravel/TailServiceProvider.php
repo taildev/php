@@ -15,8 +15,8 @@ class TailServiceProvider extends ServiceProvider
 
         Tail::init([
             'client_token' => config('tail.client_token'),
-            'service_name' => config('app.name', 'Unknown'),
-            'service_environment' => $this->app->environment(),
+            'service' => config('app.name', 'Unknown'),
+            'environment' => $this->app->environment(),
             'apm_enabled' => config('tail.apm_enabled'),
             'logs_enabled' => config('tail.logs_enabled'),
         ]);
