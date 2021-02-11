@@ -184,7 +184,10 @@ class Apm
             }
         }
 
-        Tail::client()->sendApm($t->toArray());
+        if (Tail::apmEnabled()) {
+            Tail::client()->sendApm($t->toArray());
+        }
+
         static::$t = null;
     }
 

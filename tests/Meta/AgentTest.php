@@ -31,6 +31,17 @@ class AgentTest extends TestCase
         $this->assertSame('custom-version', $agent->version());
     }
 
+    public function test_merge()
+    {
+        $agent = new Agent();
+        $agent->setName('name 1');
+        $agent->setType('type 1');
+        $agent->setVersion('version 1');
+
+        $agent->merge(['name' => 'name 2', 'type' => 'type 2']);
+
+        $this->assertSame(['name' => 'name 2', 'type' => 'type 2', 'version' => 'version 1'], $agent->toArray());
+    }
 
     public function test_output_to_array()
     {

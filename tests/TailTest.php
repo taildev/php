@@ -34,13 +34,6 @@ class TailTest extends TestCase
         $this->assertSame('config-token', Tail::client()->token());
     }
 
-    public function test_init_with_default_services_enabled()
-    {
-        Tail::init();
-        $this->assertTrue(Tail::apmEnabled());
-        $this->assertTrue(Tail::logsEnabled());
-    }
-
     public function test_init_with_env_to_disable_services()
     {
         putenv('TAIL_APM_ENABLED=false');

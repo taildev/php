@@ -36,6 +36,16 @@ class SystemTest extends TestCase
         $this->assertSame('foo-host', $this->system->hostname());
     }
 
+    public function test_merge()
+    {
+        $system = new System();
+        $system->setHostname('host 1');
+
+        $system->merge(['hostname' => 'host 2']);
+
+        $this->assertSame(['hostname' => 'host 2'], $system->toArray());
+    }
+
     public function test_output_to_array()
     {
         $system = new System();

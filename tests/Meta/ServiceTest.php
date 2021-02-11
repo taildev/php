@@ -39,6 +39,17 @@ class ServiceTest extends TestCase
         $this->assertSame('foo-env', $this->service->environment());
     }
 
+    public function test_merge()
+    {
+        $service = new Service();
+        $service->setEnvironment('env 1');
+        $service->setName('name 1');
+
+        $service->merge(['environment' => 'env 2']);
+
+        $this->assertSame(['name' => 'name 1', 'environment' => 'env 2'], $service->toArray());
+    }
+
     public function test_output_to_array()
     {
         $service = new Service('foo', 'foo-env');

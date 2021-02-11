@@ -42,6 +42,17 @@ class UserTest extends TestCase
         $this->assertSame('user@example.com', $this->user->email());
     }
 
+    public function test_merge()
+    {
+        $user = new User();
+        $user->setId('1');
+        $user->setEmail('1@1.com');
+
+        $user->merge(['email' => '2@2.com']);
+
+        $this->assertSame(['id' => '1', 'email' => '2@2.com'], $user->toArray());
+    }
+
     public function test_output_to_array()
     {
         $user = new User();

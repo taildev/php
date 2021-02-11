@@ -36,6 +36,19 @@ class TagsTest extends TestCase
         $this->assertSame($new, $tags->all());
     }
 
+    public function test_merge()
+    {
+        $tags = new Tags();
+        $tags->set('k1', 'v1');
+        $tags->set('k2', 'v2');
+        $tags->merge(['k1' => 'vv11', 'k3' => 'v3']);
+        $this->assertSame($tags->all(), [
+            'k1' => 'vv11',
+            'k2' => 'v2',
+            'k3' => 'v3',
+        ]);
+    }
+
     public function test_output_to_array()
     {
         $data = [

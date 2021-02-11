@@ -127,7 +127,7 @@ class ApmTest extends TestCase
 
     public function test_finish_and_send_to_api()
     {
-        Tail::init();
+        Tail::init(['apm_enabled' => true]);
         $client = Mockery::mock(Client::class);
         Tail::setClient($client);
 

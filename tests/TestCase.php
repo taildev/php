@@ -3,13 +3,21 @@
 namespace Tests;
 
 use Mockery;
-use PHPUnit\Framework\TestCase as PHPUnitTestCase;
+use Tail\Laravel\TailServiceProvider;
+use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-class TestCase extends PHPUnitTestCase
+class TestCase extends OrchestraTestCase
 {
 
     use MockeryPHPUnitIntegration;
+
+    protected function getPackageProviders($app)
+    {
+        return [
+            TailServiceProvider::class,
+        ];
+    }
 
     public function tearDown(): void
     {

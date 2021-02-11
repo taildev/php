@@ -152,6 +152,38 @@ class Tail
     }
 
     /**
+     * Set logs to be disabled
+     */
+    public static function disableLogs()
+    {
+        static::$logsEnabled = false;
+    }
+
+    /**
+     * Set logs to be enabled
+     */
+    public static function enableLogs()
+    {
+        static::$logsEnabled = true;
+    }
+
+    /**
+     * Set APM to be disabled
+     */
+    public static function disableApm()
+    {
+        static::$apmEnabled = false;
+    }
+
+    /**
+     * Set APM to be enabled
+     */
+    public static function enableApm()
+    {
+        static::$apmEnabled = true;
+    }
+
+    /**
      * @return TailMeta 
      */
     public static function meta()

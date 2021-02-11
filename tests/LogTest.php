@@ -45,7 +45,7 @@ class LogTest extends TestCase
 
         $client = Mockery::mock(Client::class);
         $client->shouldReceive('sendLogs')->once();
-        Tail::init();
+        Tail::init(['logs_enabled' => true]);
         Tail::setClient($client);
 
         Log::flush();
@@ -83,7 +83,7 @@ class LogTest extends TestCase
             return array_merge($log, Tail::meta()->toArray());
         }, Log::$logs);
 
-        Tail::init();
+        Tail::init(['logs_enabled' => true]);
         $client = Mockery::mock(Client::class);
         $client->shouldReceive('sendLogs')->with($expected)->once();
         Tail::setClient($client);
