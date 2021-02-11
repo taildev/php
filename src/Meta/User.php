@@ -62,6 +62,25 @@ class User
     }
 
     /**
+     * Merge provided meta array. Any keys provided will overwrite existing metadata.
+     * 
+     * @param array $meta 
+     * @return self
+     */
+    public function merge(array $meta)
+    {
+        if (array_key_exists('id', $meta)) {
+            $this->id = $meta['id'];
+        }
+
+        if (array_key_exists('email', $meta)) {
+            $this->email = $meta['email'];
+        }
+
+        return $this;
+    }
+
+    /**
      * Serialize meta information into an array
      */
     public function toArray(): array

@@ -22,15 +22,19 @@ class Tail
     /** @var string */
     protected static $environment;
 
+    /** @var TailMeta */
+    protected static $meta;
+
     /** @var Client */
     protected static $client;
 
     public static function init(array $config = [])
     {
+        static::$meta = new TailMeta();
         static::$apmEnabled = static::shouldEnableApm($config);
         static::$logsEnabled = static::shouldEnableLogs($config);
-        static::$service = static::serviceName($config);
-        static::$environment = static::environmentName($config);
+        static::$meta->service()->setName(static::serviceName($config));
+        static::$meta->service()->setEnvironment(static::environmentName($config));
 
         $token = static::clientToken($config);
         static::$client = new Client($token);
@@ -148,31 +152,59 @@ class Tail
     }
 
     /**
-     * @return string
+     * @return TailMeta 
      */
-    public static function service()
+    public static function meta()
     {
         if (!static::$initialized) {
             static::init();
         }
 
-        return static::$service;
-    }
-
-    /**
-     * @return string
-     */
-    public static function environment()
-    {
-        if (!static::$initialized) {
-            static::init();
-        }
-
-        return static::$environment;
+        return static::$meta;
     }
 
     public static function setClient(Client $client)
     {
         static::$client = $client;
+    }
+
+    /**
+     * @return \Tail\Meta\Tags
+     */
+    public static function tags()
+    {
+        return static::meta()->tags();
+    }
+
+    /**
+     * @return \Tail\Meta\User
+     */
+    public static function user()
+    {
+        return static::meta()->user();
+    }
+
+    /**
+     * @return \Tail\Meta\Agent
+     */
+    public static function agent()
+    {
+        return static::meta()->agent();
+    }
+
+    /**
+     * @return \Tail\Meta\System
+     */
+    public static function system()
+    {
+        return static::meta()->system();
+    }
+    
+    /**
+     * @return \Tail\Meta\Service
+     */
+    public static function service()
+    {
+        return static::meta()->service();
     }
 }

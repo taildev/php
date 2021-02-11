@@ -15,8 +15,12 @@ class Tags
 
     /**
      * Set custom tag value
+     * 
+     * @param string $key
+     * @param string $value
+     * @return self
      */
-    public function set(string $key, $value): Tags
+    public function set($key, $value): Tags
     {
         $this->tags[$key] = $value;
         return $this;
@@ -24,6 +28,9 @@ class Tags
 
     /**
      * Get tag value
+     * 
+     * @param string $key
+     * @return string|null
      */
     public function get(string $key)
     {
@@ -36,8 +43,11 @@ class Tags
 
     /**
      * Replace all tags with the provided key=>value array
+     * 
+     * @param array $tags
+     * @return self
      */
-    public function replaceAll(array $tags): Tags
+    public function replaceAll(array $tags)
     {
         $this->tags = $tags;
         return $this;
@@ -45,16 +55,32 @@ class Tags
 
     /**
      * All custom set tags
+     * 
+     * @return array
      */
-    public function all(): array
+    public function all()
     {
         return $this->tags;
     }
 
     /**
-     * Serialize meta information into an array
+     * Merge provided meta array. Any keys provided will overwrite existing metadata.
+     * 
+     * @param array $tags 
+     * @return self 
      */
-    public function toArray(): array
+    public function merge(array $tags)
+    {
+        $this->tags = array_merge($this->tags, $tags);
+        return $this;
+    }
+
+    /**
+     * Serialize meta information into an array
+     * 
+     * @return array
+     */
+    public function toArray()
     {
         return $this->all();
     }

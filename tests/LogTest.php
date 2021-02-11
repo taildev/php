@@ -16,14 +16,6 @@ class LogTest extends TestCase
         parent::setUp();
         Tail::$initialized = false;
         Log::$logs = [];
-        Log::resetMeta();
-    }
-
-    public function test_log_meta_returns_new_instance_of_meta()
-    {
-        $meta = Log::meta();
-        $this->assertNotNull($meta);
-        $this->assertSame($meta, Log::meta());
     }
 
     public function test_log_messages()
@@ -82,51 +74,13 @@ class LogTest extends TestCase
         Log::flush();
     }
 
-    public function test_flush_logs_sets_tail_service_meta()
-    {
-        Log::log('debug', 'my message');
-
-        Tail::init(['logs_enabled' => false]);
-        $client = Mockery::mock(Client::class);
-        $client->shouldIgnoreMissing();
-        Tail::setClient($client);
-
-        $this->assertNull(Log::meta()->service()->name());
-        $this->assertNull(Log::meta()->service()->environment());
-
-        Log::flush();
-
-        $this->assertNotNull(Log::meta()->service()->name());
-        $this->assertNotNull(Log::meta()->service()->environment());
-    }
-
-    public function test_flush_logs_does_not_change_existing_service_metadata()
-    {
-        Log::log('debug', 'my message');
-
-        Tail::init(['logs_enabled' => false]);
-        $client = Mockery::mock(Client::class);
-        $client->shouldIgnoreMissing();
-        Tail::setClient($client);
-
-        Log::meta()->service()->setName('my-custom-name');
-        Log::meta()->service()->setEnvironment('my-custom-env');
-
-        Log::flush();
-
-        $this->assertSame('my-custom-name', Log::meta()->service()->name());
-        $this->assertSame('my-custom-env', Log::meta()->service()->environment());
-    }
-
     public function test_flush_logs_attaches_metadata_to_each_record()
     {
         Log::debug('message 1');
         Log::info('message 2');
-        Log::meta()->service()->setName('my-custom-name');
-        Log::meta()->service()->setEnvironment('my-custom-env');
 
         $expected = array_map(function ($log) {
-            return array_merge($log, Log::meta()->toArray());
+            return array_merge($log, Tail::meta()->toArray());
         }, Log::$logs);
 
         Tail::init();

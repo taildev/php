@@ -301,7 +301,7 @@ class Transaction
     /**
      * Create a new child span for the transaction. If parentId is not provided, the transaction ID is used as the parent ID for the span.
      */
-    public function newSpan(string $type, string $name, ?string $parentId = null): Span
+    public function newSpan($name, $type = Span::TYPE_CUSTOM, $parentId = null): Span
     {
         $id = Id::generate();
         $parentId = $parentId ?: $this->id();
@@ -309,14 +309,6 @@ class Transaction
         $this->spans[] = $span;
 
         return $span;
-    }
-
-    /**
-     * Create a new "custom" type child span for the transaction. If parentId is not provided, the transaction ID is used as the parent ID for the span.
-     */
-    public function newCustomSpan(string $name, ?string $parentId = null): Span
-    {
-        return $this->newSpan(Span::TYPE_CUSTOM, $name, $parentId);
     }
     
     /**

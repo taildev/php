@@ -15,8 +15,9 @@ class TailTest extends TestCase
         $this->assertNotNull(Tail::client());
         $this->assertNull(Tail::client()->token());
         $this->assertTrue(Tail::$initialized);
-        $this->assertSame('Unknown', Tail::service());
-        $this->assertSame('Default', Tail::environment());
+        $this->assertNotEmpty(Tail::meta());
+        $this->assertSame('Unknown', Tail::meta()->service()->name());
+        $this->assertSame('Default', Tail::meta()->service()->environment());
     }
 
     public function test_init_with_token_env_variable()
@@ -62,28 +63,28 @@ class TailTest extends TestCase
     {
         putenv('TAIL_SERVICE=my app');
         Tail::init();
-        $this->assertSame('my app', Tail::service());
+        $this->assertSame('my app', Tail::meta()->service()->name());
     }
 
     public function test_init_with_service_config_overwrites_env()
     {
         putenv('TAIL_SERVICE=my app');
         Tail::init(['service' => 'customized']);
-        $this->assertSame('customized', Tail::service());
+        $this->assertSame('customized', Tail::meta()->service()->name());
     }
 
     public function test_init_with_environmanet_env()
     {
         putenv('TAIL_ENV=staging');
         Tail::init();
-        $this->assertSame('staging', Tail::environment());
+        $this->assertSame('staging', Tail::meta()->service()->environment());
     }
 
     public function test_init_with_environmanet_config_overwrites_env()
     {
         putenv('TAIL_ENV=staging');
         Tail::init(['environment' => 'customized']);
-        $this->assertSame('customized', Tail::environment());
+        $this->assertSame('customized', Tail::meta()->service()->environment());
     }
 
     public function test_getting_client_will_auto_init_if_not_already()
@@ -93,17 +94,10 @@ class TailTest extends TestCase
         $this->assertTrue(Tail::$initialized);
     }
 
-    public function test_getting_service_will_auto_init_if_not_already()
+    public function test_getting_meta_will_auto_init_if_not_already()
     {
         Tail::$initialized = false;
-        Tail::service();
-        $this->assertTrue(Tail::$initialized);
-    }
-
-    public function test_getting_environment_will_auto_init_if_not_already()
-    {
-        Tail::$initialized = false;
-        Tail::environment();
+        Tail::meta();
         $this->assertTrue(Tail::$initialized);
     }
 
@@ -119,5 +113,30 @@ class TailTest extends TestCase
         Tail::$initialized = false;
         Tail::logsEnabled();
         $this->assertTrue(Tail::$initialized);
+    }
+
+    public function test_tags_meta_shortcut()
+    {
+        $this->assertSame(Tail::meta()->tags(), Tail::tags());
+    }
+
+    public function test_user_meta_shortcut()
+    {
+        $this->assertSame(Tail::meta()->user(), Tail::user());
+    }
+
+    public function test_agent_meta_shortcut()
+    {
+        $this->assertSame(Tail::meta()->agent(), Tail::agent());
+    }
+
+    public function test_system_meta_shortcut()
+    {
+        $this->assertSame(Tail::meta()->system(), Tail::system());
+    }
+
+    public function test_service_meta_shortcut()
+    {
+        $this->assertSame(Tail::meta()->service(), Tail::service());
     }
 }

@@ -60,6 +60,25 @@ class Service
     }
 
     /**
+     * Merge provided meta array. Any keys provided will overwrite existing metadata.
+     * 
+     * @param array $meta 
+     * @return self
+     */
+    public function merge(array $meta)
+    {
+        if (array_key_exists('name', $meta)) {
+            $this->name = $meta['name'];
+        }
+
+        if (array_key_exists('environment', $meta)) {
+            $this->environment = $meta['environment'];
+        }
+
+        return $this;
+    }
+
+    /**
      * Serialize meta information into an array
      * 
      * @return array

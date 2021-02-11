@@ -3,11 +3,8 @@
 namespace Tail;
 
 use Tail\Apm\Span;
-use Tail\Meta\User;
 use Tail\Meta\Tags;
 use Tail\Meta\Http;
-use Tail\Meta\System;
-use Tail\Meta\Service;
 use Tail\Apm\Support\Id;
 use Tail\Apm\Transaction;
 
@@ -151,35 +148,11 @@ class Apm
     }
 
     /**
-     * Service metadata for transaction. If a transaction has not started yet a new one will be created.
-     */
-    public static function service(): Service
-    {
-        return static::transaction()->service();
-    }
-
-    /**
-     * System metadata for transaction. If a transaction has not started yet a new one will be created.
-     */
-    public static function system(): System
-    {
-        return static::transaction()->system();
-    }
-
-    /**
      * HTTP metadata for transaction. If a transaction has not started yet a new one will be created.
      */
     public static function http(): Http
     {
         return static::transaction()->http();
-    }
-
-    /**
-     * User metadata for transaction. If a transaction has not started yet a new one will be created.
-     */
-    public static function user(): User
-    {
-        return static::transaction()->user();
     }
 
     /**
@@ -199,6 +172,8 @@ class Apm
         $t = static::transaction();
         if (!$t) return;
 
+        static::mergeTransactionMetadata($t);
+
         if ($t->endTime() === null) {
             $t->finish();
         }
@@ -211,5 +186,14 @@ class Apm
 
         Tail::client()->sendApm($t->toArray());
         static::$t = null;
+    }
+
+    protected static function mergeTransactionMetadata(Transaction $t)
+    {
+        $t->tags()->merge(Tail::tags()->toArray());
+        $t->user()->merge(Tail::user()->toArray());
+        $t->agent()->merge(Tail::agent()->toArray());
+        $t->system()->merge(Tail::system()->toArray());
+        $t->service()->merge(Tail::service()->toArray());
     }
 }

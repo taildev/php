@@ -43,6 +43,21 @@ class System
     }
 
     /**
+     * Merge provided meta array. Any keys provided will overwrite existing metadata.
+     * 
+     * @param array $meta 
+     * @return self
+     */
+    public function merge(array $meta)
+    {
+        if (array_key_exists('hostname', $meta)) {
+            $this->hostname = $meta['hostname'];
+        }
+
+        return $this;
+    }
+
+    /**
      * Serialize meta information into an array
      */
     public function toArray(): array

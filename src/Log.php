@@ -3,31 +3,11 @@
 namespace Tail;
 
 use Carbon\Carbon;
-use Tail\Logs\LogMeta;
 
 class Log
 {
 
-    protected static $meta;
-
     public static $logs = [];
-
-    public static function meta()
-    {
-        if (!static::$meta) {
-            static::resetMeta();
-        }
-
-        return static::$meta;
-    }
-
-    /**
-     * Clears all existing metadata
-     */
-    public static function resetMeta()
-    {
-        self::$meta = new LogMeta();
-    }
 
     public static function emergency($message, array $context = [])
     {
@@ -100,16 +80,8 @@ class Log
 
     protected static function logsWithMetadata()
     {
-        if (!static::meta()->service()->name()) {
-            static::meta()->service()->setName(Tail::service());
-        }
-
-        if (!static::meta()->service()->environment()) {
-            static::meta()->service()->setEnvironment(Tail::environment());
-        }
-
         return array_map(function ($log) {
-            return array_merge($log, static::meta()->toArray());
+            return array_merge($log, Tail::meta()->toArray());
         }, static::$logs);
     }
 }

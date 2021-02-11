@@ -1,16 +1,16 @@
 <?php
 
-namespace Tests\Logs;
+namespace Tests;
 
 use Tests\TestCase;
-use Tail\Logs\LogMeta;
+use Tail\TailMeta;
 
 class LogMetaTest extends TestCase
 {
 
     public function test_output_to_array()
     {
-        $meta = new LogMeta();
+        $meta = new TailMeta();
         $expect = [
             'agent' => $meta->agent()->toArray(),
             'service' => $meta->service()->toArray(),

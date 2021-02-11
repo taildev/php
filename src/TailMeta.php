@@ -1,6 +1,6 @@
 <?php
 
-namespace Tail\Logs;
+namespace Tail;
 
 use Tail\Meta\Tags;
 use Tail\Meta\User;
@@ -8,7 +8,7 @@ use Tail\Meta\Agent;
 use Tail\Meta\System;
 use Tail\Meta\Service;
 
-class LogMeta
+class TailMeta
 {
 
     /** @var Agent Agent metadata */

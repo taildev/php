@@ -109,14 +109,6 @@ class ApmTest extends TestCase
         $this->assertSame('span-name', $span->name());
     }
 
-    public function test_service_metadata_for_transaction()
-    {
-        $t = Apm::startJob('foo');
-        $service = Apm::service();
-
-        $this->assertSame($t->service(), $service);
-    }
-
     public function test_http_metadata_for_transaction()
     {
         $t = Apm::startJob('foo');
@@ -125,28 +117,12 @@ class ApmTest extends TestCase
         $this->assertSame($t->http(), $http);
     }
 
-    public function test_system_metadata_for_transaction()
-    {
-        $t = Apm::startJob('foo');
-        $system = Apm::system();
-
-        $this->assertSame($t->system(), $system);
-    }
-
     public function test_tag_metadata_for_transaction()
     {
         $t = Apm::startJob('foo');
         $tags = Apm::tags();
 
         $this->assertSame($t->tags(), $tags);
-    }
-
-    public function test_user_metadata_for_transaction()
-    {
-        $t = Apm::startJob('foo');
-        $user = Apm::user();
-
-        $this->assertSame($t->user(), $user);
     }
 
     public function test_finish_and_send_to_api()
@@ -158,13 +134,50 @@ class ApmTest extends TestCase
         Apm::startRequest('GET', '/foo');
 
         $t = Apm::transaction();
+        $client->shouldReceive('sendApm')->once();
         $t->finish();
-        $client->shouldReceive('sendApm')->with($t->toArray());
 
         Apm::finish();
 
         // Transaction should have been cleared
         $this->assertNotSame($t, Apm::transaction());
+    }
+
+    public function test_finish_merges_global_metadata()
+    {
+        Tail::init();
+        $client = Mockery::mock(Client::class);
+        $client->shouldReceive('sendApm');
+        Tail::setClient($client);
+
+        $t = Apm::startJob('some job');
+        $t->tags()->set('k1', 'v1');
+        $t->user()->setEmail('1@testing.com');
+        $t->agent()->setName('testing1');
+        $t->system()->setHostname('host1');
+        $t->service()->setName('service1');
+
+        Tail::meta()->tags()->set('k1', 'v2');
+        Tail::meta()->tags()->set('k2', 'v2again');
+        Tail::meta()->user()->setEmail('2@testing.com');
+        Tail::meta()->user()->setId('2');
+        Tail::meta()->agent()->setName('testing2');
+        Tail::meta()->agent()->setVersion('version2');
+        Tail::meta()->system()->setHostname('host2');
+        Tail::meta()->service()->setName('service2');
+        Tail::meta()->service()->setEnvironment('env2');
+
+        Apm::finish();
+
+        $this->assertSame('v2', $t->tags()->get('k1'));
+        $this->assertSame('v2again', $t->tags()->get('k2'));
+        $this->assertSame('2@testing.com', $t->user()->email());
+        $this->assertSame('2', $t->user()->id());
+        $this->assertSame('testing2', $t->agent()->name());
+        $this->assertSame('version2', $t->agent()->version());
+        $this->assertSame('host2', $t->system()->hostname());
+        $this->assertSame('service2', $t->service()->name());
+        $this->assertSame('env2', $t->service()->environment());
     }
 
     public function test_finish_sets_the_finish_time_for_transaction_if_not_set()
