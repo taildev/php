@@ -316,7 +316,7 @@ class Transaction
      */
     public function newDatabaseSpan(string $name, ?string $parentId = null): Span
     {
-        return $this->newSpan(Span::TYPE_DATABASE, $name, $parentId);
+        return $this->newSpan($name, Span::TYPE_DATABASE, $parentId);
     }
 
     /**
@@ -324,7 +324,7 @@ class Transaction
      */
     public function newCacheSpan(string $name, ?string $parentId = null): Span
     {
-        return $this->newSpan(Span::TYPE_CACHE, $name, $parentId);
+        return $this->newSpan($name, Span::TYPE_CACHE, $parentId);
     }
 
     /**
@@ -332,7 +332,7 @@ class Transaction
      */
     public function newFilesystemSpan(string $name, ?string $parentId = null): Span
     {
-        return $this->newSpan(Span::TYPE_FILESYSTEM, $name, $parentId);
+        return $this->newSpan($name, Span::TYPE_FILESYSTEM, $parentId);
     }
 
     /**

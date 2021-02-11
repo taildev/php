@@ -78,11 +78,11 @@ class ApmTest extends TestCase
     public function test_new_span_creates_new_span_for_transaction()
     {
         $t = Apm::startJob('some-job');
-        $span = Apm::newSpan('span-type', 'span-name');
+        $span = Apm::newSpan('span-name', 'span-type');
 
         $this->assertSame($t->id(), $span->parentId());
-        $this->assertSame('span-type', $span->type());
         $this->assertSame('span-name', $span->name());
+        $this->assertSame('span-type', $span->type());
     }
 
     public function test_new_database_span()

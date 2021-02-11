@@ -177,27 +177,18 @@ class TransactionTest extends TestCase
 
     public function test_new_span()
     {
-        $span = $this->transaction->newSpan('some-type', 'some-name');
-        $this->assertSame('some-type', $span->type());
+        $span = $this->transaction->newSpan('some-name', 'some-type');
         $this->assertSame('some-name', $span->name());
+        $this->assertSame('some-type', $span->type());
         $this->assertNotEmpty($span->id());
         $this->assertSame('id-123', $span->parentId());
         $this->assertSame('id-123', $span->transaction()->id());
 
-        $spanCustomParent = $this->transaction->newSpan('some-type', 'some-name', 'custom-id');
+        $spanCustomParent = $this->transaction->newSpan('some-name', 'some-type', 'custom-id');
         $this->assertSame('custom-id', $spanCustomParent->parentId());
         $this->assertSame('id-123', $spanCustomParent->transaction()->id());
 
         $this->assertSame([$span, $spanCustomParent], $this->transaction->spans());
-    }
-
-    public function test_new_custom_span()
-    {
-        $span = $this->transaction->newCustomSpan('some-name');
-        $this->assertSame(Span::TYPE_CUSTOM, $span->type());
-        $this->assertSame('some-name', $span->name());
-        $this->assertNotEmpty($span->id());
-        $this->assertSame('id-123', $span->parentId());
     }
 
     public function test_new_database_span()

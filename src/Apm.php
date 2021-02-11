@@ -118,7 +118,7 @@ class Apm
     /**
      * Create new span for current transaction. If a transaction has not started yet a new one will be created.
      */
-    public static function newSpan(string $type, string $name): Span
+    public static function newSpan($name, $type = Span::TYPE_CUSTOM): Span
     {
         return static::transaction()->newSpan($type, $name);
     }
