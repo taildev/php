@@ -120,7 +120,7 @@ class Apm
      */
     public static function newSpan($name, $type = Span::TYPE_CUSTOM): Span
     {
-        return static::transaction()->newSpan($type, $name);
+        return static::transaction()->newSpan($name, $type);
     }
 
     /**
