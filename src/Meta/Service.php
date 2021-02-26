@@ -32,7 +32,7 @@ class Service
      *
      * @return Service
      */
-    public function setName(string $name)
+    public function setName(?string $name)
     {
         $this->name = $name;
         return $this;
