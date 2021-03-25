@@ -28,13 +28,10 @@ class ClientTest extends TestCase
             ['message' => "message \n2"],
         ];
 
-        $expectedPayload = '{"message":"message 1"}
-{"message":"message \n2"}';
-
         $this->guzzle->shouldReceive('post')->with(
             Client::LOGS_ENDPOINT,
             [
-                'body' => $expectedPayload,
+                'json' => $logs,
                 'headers' => [
                     'Authorization' => 'Bearer secret_token',
                 ],

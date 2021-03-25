@@ -71,23 +71,14 @@ class Client
     private function registerDefaultLogSendHandler()
     {
         $this->registerLogSendHandler(function (array $logs) {
-            $encoded = [];
-            foreach ($logs as $log) {
-                $encoded[] = json_encode($log);
-            }
-
             $url = getenv('TAIL_LOGS_ENDPOINT') ?: self::LOGS_ENDPOINT;
-            $payload = implode("\n", $encoded);
 
-            $this->guzzle->post(
-                $url,
-                [
-                    'body' => $payload,
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->token,
-                    ],
-                ]
-            );
+            $this->guzzle->post($url, [
+                'json' => $logs,
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->token,
+                ],
+            ]);
         });
     }
 
