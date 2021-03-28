@@ -31,7 +31,14 @@ class HttpTracker implements Tracker
         $params = $route ? $route->parameters() : [];
         $requestHeaders = $this->requestHeaders($event->request);
         $responseHeaders = $this->responseHeaders($event->response);
-        $status = $event->response->status();
+
+        $status = null;
+        if (method_exists($event->response, 'status')) {
+          $status = $event->response->status();
+        }
+        if (method_exists($event->response, 'getStatusCode')) {
+          $status = $event->response->getStatusCode();
+        }
 
         Apm::transaction()
             ->setType(Transaction::TYPE_REQUEST)
