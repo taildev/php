@@ -69,16 +69,16 @@ class SpanTest extends TestCase
     public function test_new_child_span()
     {
         $childSpan = Mockery::mock(Span::class);
-        $this->transaction->shouldReceive('newSpan')->with('some-type', 'some-name', 'id-123')->andReturn($childSpan);
+        $this->transaction->shouldReceive('newSpan')->with('some-name', 'some-type', 'id-123')->andReturn($childSpan);
 
-        $result = $this->span->newChildSpan('some-type', 'some-name');
+        $result = $this->span->newChildSpan('some-name', 'some-type');
         $this->assertSame($childSpan, $result);
     }
 
     public function test_new_child_custom_span()
     {
         $childSpan = Mockery::mock(Span::class);
-        $this->transaction->shouldReceive('newSpan')->with(Span::TYPE_CUSTOM, 'some-name', 'id-123')->andReturn($childSpan);
+        $this->transaction->shouldReceive('newSpan')->with('some-name', Span::TYPE_CUSTOM, 'id-123')->andReturn($childSpan);
 
         $result = $this->span->newChildCustomSpan('some-name');
         $this->assertSame($childSpan, $result);
@@ -87,7 +87,7 @@ class SpanTest extends TestCase
     public function test_new_child_database_span()
     {
         $childSpan = Mockery::mock(Span::class);
-        $this->transaction->shouldReceive('newSpan')->with(Span::TYPE_DATABASE, 'some-name', 'id-123')->andReturn($childSpan);
+        $this->transaction->shouldReceive('newSpan')->with('some-name', Span::TYPE_DATABASE, 'id-123')->andReturn($childSpan);
 
         $result = $this->span->newChildDatabaseSpan('some-name');
         $this->assertSame($childSpan, $result);
@@ -96,7 +96,7 @@ class SpanTest extends TestCase
     public function test_new_child_cache_span()
     {
         $childSpan = Mockery::mock(Span::class);
-        $this->transaction->shouldReceive('newSpan')->with(Span::TYPE_CACHE, 'some-name', 'id-123')->andReturn($childSpan);
+        $this->transaction->shouldReceive('newSpan')->with('some-name', Span::TYPE_CACHE, 'id-123')->andReturn($childSpan);
 
         $result = $this->span->newChildCacheSpan('some-name');
         $this->assertSame($childSpan, $result);
@@ -105,7 +105,7 @@ class SpanTest extends TestCase
     public function test_new_child_filesystem_span()
     {
         $childSpan = Mockery::mock(Span::class);
-        $this->transaction->shouldReceive('newSpan')->with(Span::TYPE_FILESYSTEM, 'some-name', 'id-123')->andReturn($childSpan);
+        $this->transaction->shouldReceive('newSpan')->with('some-name', Span::TYPE_FILESYSTEM, 'id-123')->andReturn($childSpan);
 
         $result = $this->span->newChildFilesystemSpan('some-name');
         $this->assertSame($childSpan, $result);

@@ -88,9 +88,9 @@ class Span
     /**
      * Create a new child span with the given type, name and this span as the parent.
      */
-    public function newChildSpan(string $type, string $name): Span
+    public function newChildSpan(string $name, string $type = self::TYPE_CUSTOM): Span
     {
-        return $this->transaction->newSpan($type, $name, $this->id());
+        return $this->transaction->newSpan($name, $type, $this->id());
     }
 
     /**
@@ -98,7 +98,7 @@ class Span
      */
     public function newChildCustomSpan(string $name): Span
     {
-        return $this->newChildSpan(self::TYPE_CUSTOM, $name);
+        return $this->newChildSpan($name, self::TYPE_CUSTOM);
     }
 
     /**
@@ -106,7 +106,7 @@ class Span
      */
     public function newChildDatabaseSpan(string $name): Span
     {
-        return $this->newChildSpan(self::TYPE_DATABASE, $name);
+        return $this->newChildSpan($name, self::TYPE_DATABASE);
     }
 
     /**
@@ -114,7 +114,7 @@ class Span
      */
     public function newChildCacheSpan(string $name): Span
     {
-        return $this->newChildSpan(self::TYPE_CACHE, $name);
+        return $this->newChildSpan($name, self::TYPE_CACHE);
     }
 
     /**
@@ -122,7 +122,7 @@ class Span
      */
     public function newChildFilesystemSpan(string $name): Span
     {
-        return $this->newChildSpan(self::TYPE_FILESYSTEM, $name);
+        return $this->newChildSpan($name, self::TYPE_FILESYSTEM);
     }
 
     /**
