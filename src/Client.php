@@ -44,11 +44,11 @@ class Client
         $this->apmSendHandlers[] = $handler;
     }
 
-    public function sendError(array $error)
+    public function sendErrors(array $errors)
     {
         $handlers = array_reverse($this->errorSendHandlers);
         foreach ($handlers as $handler) {
-            if ($handler($error) === false) {
+            if ($handler($errors) === false) {
                 return;
             }
         }

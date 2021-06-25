@@ -2,12 +2,10 @@
 namespace Tail;
 
 use Tail\Error\Trace;
-use Tail\Meta\Cookies;
-use Tail\Meta\Http;
 
 class Error
 {
-    public static $error;
+    public static $errors = [];
 
     /**
      * Capture the exception
@@ -23,15 +21,33 @@ class Error
             'runtime' => 'php',
             'runtime_version' => phpversion(),
             'time' => gmdate(DATE_ATOM),
-            'http' => (new Http())->toArray(),
-            'cookies' => (new Cookies())->toArray(),
             'trace' => (new Trace($e->getTrace()))->toArray(),
         ];
 
-        static::$error = $error;
+        static::$errors[] = $error;
+    }
 
-        if (Tail::errorsEnabled()) {
-            Tail::client()->sendError(static::$error);
+    /**
+     * Send and then delete any existing errors
+     */
+    public static function send()
+    {
+        if (count(static::$errors) === 0) {
+            return;
         }
+
+        $errors = static::errorsWithMetadata();
+        if (Tail::errorsEnabled()) {
+            Tail::client()->sendErrors($errors);
+        }
+
+        static::$errors = [];
+    }
+
+    protected static function errorsWithMetadata()
+    {
+        return array_map(function ($error) {
+            return array_merge($error, Tail::meta()->toArray());
+        }, static::$errors);
     }
 }

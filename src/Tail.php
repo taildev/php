@@ -132,6 +132,7 @@ class Tail
     {
         Apm::finish();
         Log::flush();
+        Error::send();
     }
 
     /**
