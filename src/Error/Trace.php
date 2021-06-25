@@ -19,13 +19,15 @@ class Trace
                 'args' => [],
             ];
 
-            foreach ($t['args'] as $arg) {
-                if (is_array($arg)) {
-                    $traceArr['args'][] = json_encode($arg);
-                } else if (is_object($arg)) {
-                    $traceArr['args'][] = get_class($arg);
-                } else {
-                    $traceArr['args'][] = $arg;
+            if (isset($t['args'])) {
+                foreach ($t['args'] as $arg) {
+                    if (is_array($arg)) {
+                        $traceArr['args'][] = json_encode($arg);
+                    } else if (is_object($arg)) {
+                        $traceArr['args'][] = get_class($arg);
+                    } else {
+                        $traceArr['args'][] = $arg;
+                    }
                 }
             }
 
