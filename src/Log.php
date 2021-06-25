@@ -2,8 +2,6 @@
 
 namespace Tail;
 
-use Carbon\Carbon;
-
 class Log
 {
 
@@ -55,7 +53,7 @@ class Log
             'level' => $level,
             'message' => $message,
             'context' => $context,
-            'time' => Carbon::now()->toIso8601String(),
+            'time' => gmdate(DATE_ATOM),
         ];
 
         static::$logs[] = $log;

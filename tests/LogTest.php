@@ -3,10 +3,9 @@
 namespace Tests;
 
 use Mockery;
+use Tail\Client;
 use Tail\Log;
 use Tail\Tail;
-use Tail\Client;
-use Carbon\Carbon;
 
 class LogTest extends TestCase
 {
@@ -24,19 +23,19 @@ class LogTest extends TestCase
         Log::log('debug', 'My debug message', ['number' => 2]);
 
         $this->assertCount(2, Log::$logs);
-        $expectedTime = Carbon::now()->timestamp;
+        $expectedTime = time();
 
         $log1 = Log::$logs[0];
         $this->assertSame('info', $log1['level']);
         $this->assertSame('My info message', $log1['message']);
         $this->assertSame(['number' => 1], $log1['context']);
-        $this->assertEqualsWithDelta($expectedTime, Carbon::parse($log1['time'])->timestamp, 1);
+        $this->assertEqualsWithDelta($expectedTime, strtotime($log1['time']), 1);
 
         $log2 = Log::$logs[1];
         $this->assertSame('debug', $log2['level']);
         $this->assertSame('My debug message', $log2['message']);
         $this->assertSame(['number' => 2], $log2['context']);
-        $this->assertEqualsWithDelta($expectedTime, Carbon::parse($log2['time'])->timestamp, 1);
+        $this->assertEqualsWithDelta($expectedTime, strtotime($log2['time']), 1);
     }
 
     public function test_flush_logs()

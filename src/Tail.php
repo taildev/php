@@ -16,6 +16,9 @@ class Tail
     /** @var bool */
     protected static $logsEnabled;
 
+    /** @var bool */
+    protected static $errorsEnabled;
+
     /** @var string */
     protected static $service;
 
@@ -33,6 +36,7 @@ class Tail
         static::$meta = new TailMeta();
         static::$apmEnabled = static::shouldEnableApm($config);
         static::$logsEnabled = static::shouldEnableLogs($config);
+        static::$errorsEnabled = static::shouldEnableErrors($config);
         static::$meta->service()->setName(static::serviceName($config));
         static::$meta->service()->setEnvironment(static::environmentName($config));
 
@@ -82,6 +86,21 @@ class Tail
 
         if (array_key_exists('logs_enabled', $config)) {
             $enable = $config['logs_enabled'];
+        }
+
+        return $enable;
+    }
+
+    protected static function shouldEnableErrors(array $config)
+    {
+        $enable = true;
+
+        if (Env::get('TAIL_ERRORS_ENABLED') !== null) {
+            $enable = Env::get('TAIL_ERRORS_ENABLED');
+        }
+
+        if (array_key_exists('errors_enabled', $config)) {
+            $enable = $config['errors_enabled'];
         }
 
         return $enable;
@@ -140,6 +159,22 @@ class Tail
     }
 
     /**
+     * Set APM to be disabled
+     */
+    public static function disableApm()
+    {
+        static::$apmEnabled = false;
+    }
+
+    /**
+     * Set APM to be enabled
+     */
+    public static function enableApm()
+    {
+        static::$apmEnabled = true;
+    }
+
+    /**
      * @return bool
      */
     public static function logsEnabled()
@@ -168,19 +203,31 @@ class Tail
     }
 
     /**
-     * Set APM to be disabled
+     * @return bool
      */
-    public static function disableApm()
+    public static function errorsEnabled()
     {
-        static::$apmEnabled = false;
+        if (!static::$initialized) {
+            static::init();
+        }
+
+        return static::$errorsEnabled;
     }
 
     /**
-     * Set APM to be enabled
+     * Set errors to be disabled
      */
-    public static function enableApm()
+    public static function disableErrors()
     {
-        static::$apmEnabled = true;
+        static::$errorsEnabled = false;
+    }
+
+    /**
+     * Set errors to be enabled
+     */
+    public static function enableErrors()
+    {
+        static::$errorsEnabled = true;
     }
 
     /**

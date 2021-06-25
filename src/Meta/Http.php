@@ -23,15 +23,33 @@ class Http
     /** @var int Response status */
     protected $responseStatus;
 
+    /** @var string Remote address */
+    protected $remoteAddress;
+
     public function __construct()
     {
-        if (isset($_SERVER['REQUEST_METHOD'])) {
-            $this->setMethod($_SERVER['REQUEST_METHOD']);
-        }
+        $this->setMethod($this->getServerVar('REQUEST_METHOD'));
+        $this->setUrl($this->getServerVar('REQUEST_URI'));
+        $this->setRemoteAddress($this->getServerVar('REMOTE_ADDR'));
+        $this->setRequestHeaders(array_filter([
+            'host' => $this->getServerVar('HTTP_HOST'),
+            'connection' => $this->getServerVar('HTTP_CONNECTION'),
+            'user_agent' => $this->getServerVar('HTTP_USER_AGENT'),
+            'cache_control' => $this->getServerVar('HTTP_CACHE_CONTROL'),
+            'sec_ch_ua' => $this->getServerVar('HTTP_SEC_CH_UA'),
+            'sec_ch_ua_mobile' => $this->getServerVar('HTTP_SEC_CH_UA_MOBILE'),
+            'upgrade_insecure_requests' => $this->getServerVar('HTTP_UPGRADE_INSECURE_REQUESTS'),
+            'accept' => $this->getServerVar('HTTP_ACCEPT'),
+            'sec_fetch_site' => $this->getServerVar('HTTP_SEC_FETCH_SITE'),
+            'sec_fetch_mode' => $this->getServerVar('HTTP_SEC_FETCH_MODE'),
+            'sec_fetch_user' => $this->getServerVar('HTTP_SEC_FETCH_USER'),
+            'sec_fetch_dest' => $this->getServerVar('HTTP_SEC_FETCH_DEST'),
+            'accept_encoding' => $this->getServerVar('HTTP_ACCEPT_ENCODING'),
+            'accept_language' => $this->getServerVar('HTTP_ACCEPT_LANGUAGE'),
+        ]));
 
-        if (isset($_SERVER['REQUEST_URI'])) {
-            $this->setUrl($_SERVER['REQUEST_URI']);
-        }
+        parse_str($this->getServerVar('QUERY_STRING'), $queryArr);
+        $this->setUrlParams($queryArr);
     }
 
     /**
@@ -45,6 +63,10 @@ class Http
 
         if (array_key_exists('url', $properties)) {
             $this->setUrl($properties['url']);
+        }
+
+        if (array_key_exists('remote_address', $properties)) {
+            $this->setRemoteAddress($properties['remote_address']);
         }
 
         if (array_key_exists('url_params', $properties)) {
@@ -185,6 +207,26 @@ class Http
     }
 
     /**
+     * Set the remote address.
+     */
+    public function setRemoteAddress(?string $address): Http
+    {
+        if ($address !== null) {
+            $this->remoteAddress = $address;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the remote address
+     */
+    public function remoteAddress(): ?string
+    {
+        return $this->remoteAddress;
+    }
+
+    /**
      * Set the response status code.
      */
     public function setResponseStatus(?int $status): Http
@@ -205,6 +247,17 @@ class Http
             'request_headers' => $this->requestHeaders(),
             'response_headers' => $this->responseHeaders(),
             'response_status' => $this->responseStatus(),
+            'remote_address' => $this->remoteAddress(),
         ];
+    }
+    /**
+     * Get $_SERVER variables if available
+     */
+    private function getServerVar($name): ?string
+    {
+        if (!isset($_SERVER[$name])) {
+            return null;
+        }
+        return $_SERVER[$name];
     }
 }
