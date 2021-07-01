@@ -2,11 +2,12 @@
 
 namespace Tail;
 
+use Tail\Meta\Agent;
+use Tail\Meta\Cookies;
+use Tail\Meta\Service;
+use Tail\Meta\System;
 use Tail\Meta\Tags;
 use Tail\Meta\User;
-use Tail\Meta\Agent;
-use Tail\Meta\System;
-use Tail\Meta\Service;
 
 class TailMeta
 {
@@ -23,6 +24,9 @@ class TailMeta
     /** @var Tags Custom metadata */
     protected $tags;
 
+    /** @var Cookies Custom metadata */
+    protected $cookies;
+
     /** @var User User metadata */
     protected $user;
 
@@ -32,6 +36,7 @@ class TailMeta
         $this->service = new Service();
         $this->system = new System();
         $this->tags = new Tags();
+        $this->cookies = new Cookies();
         $this->user = new User();
     }
 
@@ -40,7 +45,7 @@ class TailMeta
      *
      * @return Agent
      */
-    public function agent()
+    public function agent(): Agent
     {
         return $this->agent;
     }
@@ -50,7 +55,7 @@ class TailMeta
      *
      * @return Service
      */
-    public function service()
+    public function service(): Service
     {
         return $this->service;
     }
@@ -60,7 +65,7 @@ class TailMeta
      *
      * @return System
      */
-    public function system()
+    public function system(): System
     {
         return $this->system;
     }
@@ -70,9 +75,19 @@ class TailMeta
      *
      * @return Tags
      */
-    public function tags()
+    public function tags(): Tags
     {
         return $this->tags;
+    }
+
+    /**
+     * Get/set custom metadata
+     *
+     * @return Cookies
+     */
+    public function cookies(): Cookies
+    {
+        return $this->cookies;
     }
 
     /**
@@ -80,11 +95,10 @@ class TailMeta
      *
      * @return User
      */
-    public function user()
+    public function user(): User
     {
         return $this->user;
     }
-
 
     public function toArray()
     {
@@ -94,6 +108,7 @@ class TailMeta
             'system' => $this->system->toArray(),
             'tags' => $this->tags->toArray(),
             'user' => $this->user->toArray(),
+            'cookies' => $this->cookies->toArray(),
         ];
     }
 }

@@ -4,9 +4,9 @@ namespace Tests\Apm;
 
 use Mockery;
 use Tail\Apm\Span;
-use Tests\TestCase;
-use Tail\Apm\Transaction;
 use Tail\Apm\Support\Timestamp;
+use Tail\Apm\Transaction;
+use Tests\TestCase;
 
 class TransactionTest extends TestCase
 {
@@ -27,62 +27,63 @@ class TransactionTest extends TestCase
     public function test_create_from_array()
     {
         $transaction = Transaction::createFromArray($data = [
-           'trace' => [
-               'id' => 'custom-transaction-id',
-               'type' => Transaction::TYPE_JOB,
-               'name' => 'custom-name',
-               'start_time' => 123.1,
-               'end_time' => 456.2,
-               'duration' => 333.1,
-           ],
-           'agent' => [
-               'name' => 'custom-agent-name',
-               'type' => 'custom-agent-type',
-               'version' => 'custom-agent-version',
-           ],
-           'http' => [
-               'method' => 'CUSTOM-HTTP-METHOD',
-               'url' => 'custom-url',
-               'url_params' => ['foo' => 'bar'],
-               'request_headers' => ['auth' => '123'],
-               'response_headers' => ['type' => 'json'],
-               'response_status' => 200,
-           ],
-           'service' => [
-               'name' => 'custom-service',
-               'environment' => 'custom-env',
-           ],
-           'system' => [
-               'hostname' => 'custom-hostname',
-           ],
-           'tags' => [
-               'custom' => 'tag',
-           ],
-           'user' => [
-               'id' => 'custom-id',
-               'email' => 'custom-email',
-           ],
-           'spans' => [
-               [
-                   'trace' => [
-                       'type' => 'some-type',
-                       'name' => 'some-span',
-                       'id' => 'span-id',
-                       'parent_id' => 'span-parent-id',
-                       'transaction_id' => 'custom-transaction-id',
-                       'start_time' => 123.4,
-                       'end_time' => 234.5,
-                       'duration' => 111.1,
-                   ],
-                   'database' => [
-                       'name' => 'custom-db-name',
-                       'query' => 'custom-db-query',
-                   ],
-                   'tags' => [
-                       'span-foo' => 'span-bar',
-                   ],
-               ]
-           ],
+            'trace' => [
+                'id' => 'custom-transaction-id',
+                'type' => Transaction::TYPE_JOB,
+                'name' => 'custom-name',
+                'start_time' => 123.1,
+                'end_time' => 456.2,
+                'duration' => 333.1,
+            ],
+            'agent' => [
+                'name' => 'custom-agent-name',
+                'type' => 'custom-agent-type',
+                'version' => 'custom-agent-version',
+            ],
+            'http' => [
+                'method' => 'CUSTOM-HTTP-METHOD',
+                'url' => 'custom-url',
+                'url_params' => ['foo' => 'bar'],
+                'request_headers' => ['auth' => '123'],
+                'response_headers' => ['type' => 'json'],
+                'response_status' => 200,
+                'remote_address' => '127.0.0.1',
+            ],
+            'service' => [
+                'name' => 'custom-service',
+                'environment' => 'custom-env',
+            ],
+            'system' => [
+                'hostname' => 'custom-hostname',
+            ],
+            'tags' => [
+                'custom' => 'tag',
+            ],
+            'user' => [
+                'id' => 'custom-id',
+                'email' => 'custom-email',
+            ],
+            'spans' => [
+                [
+                    'trace' => [
+                        'type' => 'some-type',
+                        'name' => 'some-span',
+                        'id' => 'span-id',
+                        'parent_id' => 'span-parent-id',
+                        'transaction_id' => 'custom-transaction-id',
+                        'start_time' => 123.4,
+                        'end_time' => 234.5,
+                        'duration' => 111.1,
+                    ],
+                    'database' => [
+                        'name' => 'custom-db-name',
+                        'query' => 'custom-db-query',
+                    ],
+                    'tags' => [
+                        'span-foo' => 'span-bar',
+                    ],
+                ],
+            ],
         ]);
 
         $this->assertSame($data, $transaction->toArray());

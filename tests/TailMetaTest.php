@@ -2,8 +2,8 @@
 
 namespace Tests;
 
-use Tests\TestCase;
 use Tail\TailMeta;
+use Tests\TestCase;
 
 class LogMetaTest extends TestCase
 {
@@ -17,6 +17,7 @@ class LogMetaTest extends TestCase
             'system' => $meta->system()->toArray(),
             'tags' => $meta->tags()->toArray(),
             'user' => $meta->user()->toArray(),
+            'cookies' => $meta->cookies()->toArray(),
         ];
 
         $this->assertSame($expect, $meta->toArray());
