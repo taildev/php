@@ -290,40 +290,39 @@ class Transaction
     }
 
     /**
-     * Create a new child span for the transaction. If parentId is not provided, the transaction ID is used as the parent ID for the span.
+     * Create a new child span for the transaction. 
      */
-    public function newSpan($name, $type = Span::TYPE_CUSTOM, $parentId = null): Span
+    public function newSpan($name, $type = Span::TYPE_CUSTOM, $parentSpanId = null): Span
     {
         $id = Id::generate();
-        $parentId = $parentId ?: $this->id();
-        $span = new Span($this, $type, $name, $id, $parentId);
+        $span = new Span($this, $type, $name, $id, $parentSpanId);
         $this->spans[] = $span;
 
         return $span;
     }
 
     /**
-     * Create a new "database" type child span for the transaction. If parentId is not provided, the transaction ID is used as the parent ID for the span.
+     * Create a new "database" type child span for the transaction
      */
-    public function newDatabaseSpan(string $name, ?string $parentId = null): Span
+    public function newDatabaseSpan(string $name, ?string $parentSpanId = null): Span
     {
-        return $this->newSpan($name, Span::TYPE_DATABASE, $parentId);
+        return $this->newSpan($name, Span::TYPE_DATABASE, $parentSpanId);
     }
 
     /**
-     * Create a new "cache" type child span for the transaction. If parentId is not provided, the transaction ID is used as the parent ID for the span.
+     * Create a new "cache" type child span for the transaction
      */
-    public function newCacheSpan(string $name, ?string $parentId = null): Span
+    public function newCacheSpan(string $name, ?string $parentSpanId = null): Span
     {
-        return $this->newSpan($name, Span::TYPE_CACHE, $parentId);
+        return $this->newSpan($name, Span::TYPE_CACHE, $parentSpanId);
     }
 
     /**
-     * Create a new "filesystem" type child span for the transaction. If parentId is not provided, the transaction ID is used as the parent ID for the span.
+     * Create a new "filesystem" type child span for the transaction
      */
-    public function newFilesystemSpan(string $name, ?string $parentId = null): Span
+    public function newFilesystemSpan(string $name, ?string $parentSpanId = null): Span
     {
-        return $this->newSpan($name, Span::TYPE_FILESYSTEM, $parentId);
+        return $this->newSpan($name, Span::TYPE_FILESYSTEM, $parentSpanId);
     }
 
     /**

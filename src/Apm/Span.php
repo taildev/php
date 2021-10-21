@@ -27,8 +27,8 @@ class Span
     /** @var string Unique ID for span */
     protected $id;
 
-    /** @var string ID that span belongs to, may be another span or the transaction ID */
-    protected $parentId;
+    /** @var string|null ID that span belongs to*/
+    protected $parentSpanId;
 
     /** @var int Start time as milliseconds since epoch */
     protected $startTime;
@@ -52,33 +52,33 @@ class Span
         $type = $trace['type'];
         $name = $trace['name'];
         $id = $trace['id'];
-        $parentId = $trace['parent_id'];
+        $parentSpanId = isset($trace['parent_span_id']) ? $trace['parent_span_id'] : null;
         $startTime = $trace['start_time'];
-        $endTime = array_key_exists('end_time', $trace) ? $trace['end_time'] : null;
+        $endTime = isset($trace['end_time']) ? $trace['end_time'] : null;
 
         # create span
-        $span = new Span($transaction, $type, $name, $id, $parentId);
+        $span = new Span($transaction, $type, $name, $id, $parentSpanId);
         $span->setStartTime($startTime);
         $span->setEndTime($endTime);
 
         # database properties
-        $database = array_key_exists('database', $properties) ? $properties['database'] : [];
+        $database = isset($properties['database']) ? $properties['database'] : [];
         $span->database()->fillFromArray($database);
 
         # tags
-        $tags = array_key_exists('tags', $properties) ? $properties['tags'] : [];
+        $tags = isset($properties['tags']) ? $properties['tags'] : [];
         $span->tags()->replaceAll($tags);
 
         return $span;
     }
 
-    public function __construct(Transaction $transaction, string $type, string $name, string $id, string $parentId)
+    public function __construct(Transaction $transaction, string $type, string $name, string $id, ?string $parentSpanId = null)
     {
         $this->transaction = $transaction;
         $this->type = $type;
         $this->name = $name;
         $this->id = $id;
-        $this->parentId = $parentId;
+        $this->parentSpanId = $parentSpanId;
 
         $this->startTime = Timestamp::nowInMs();
 
@@ -97,9 +97,9 @@ class Span
     /**
      * Create a new "custom" type child span
      */
-    public function newChildCustomSpan(string $name): Span
+    public function newChildCustomSpan(string $name, string $type = self::TYPE_CUSTOM): Span
     {
-        return $this->newChildSpan($name, self::TYPE_CUSTOM);
+        return $this->newChildSpan($name, $type);
     }
 
     /**
@@ -186,19 +186,19 @@ class Span
     }
 
     /**
-     * Get the parent ID of this span
+     * Get the parent span ID
      */
-    public function parentId(): string
+    public function parentSpanId(): ?string
     {
-        return $this->parentId;
+        return $this->parentSpanId;
     }
 
     /**
-     * Set parent ID for span. If not direct parent span exists, the transaction ID should be used.
+     * Set parent span ID
      */
-    public function setParentId(string $parentId): Span
+    public function setParentSpanId(?string $parentSpanId): Span
     {
-        $this->parentId = $parentId;
+        $this->parentSpanId = $parentSpanId;
         return $this;
     }
 
@@ -276,8 +276,7 @@ class Span
                 'type' => $this->type(),
                 'name' => $this->name(),
                 'id' => $this->id,
-                'parent_id' => $this->parentId(),
-                'transaction_id' => $this->transaction()->id(),
+                'parent_span_id' => $this->parentSpanId(),
                 'start_time' => $this->startTime(),
                 'end_time' => $this->endTime(),
             ],

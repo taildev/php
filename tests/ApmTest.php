@@ -80,7 +80,6 @@ class ApmTest extends TestCase
         $t = Apm::startJob('some-job');
         $span = Apm::newSpan('span-name', 'span-type');
 
-        $this->assertSame($t->id(), $span->parentId());
         $this->assertSame('span-name', $span->name());
         $this->assertSame('span-type', $span->type());
     }

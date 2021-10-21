@@ -22,19 +22,17 @@ class SpanTest extends TestCase
     {
         parent::setUp();
         $this->transaction = Mockery::mock(Transaction::class);
-        $this->span = new Span($this->transaction, 'some-type', 'some-span', 'id-123', 'parent-id', 'transaction-id');
+        $this->span = new Span($this->transaction, 'some-type', 'some-span', 'id-123', 'parent-span-id');
     }
 
     public function test_create_from_array()
     {
-        $this->transaction->shouldReceive('id')->andReturn('transaction-id');
         $span = Span::createFromArray($this->transaction, $data = [
            'trace' => [
                'type' => 'some-type',
                'name' => 'some-span',
                'id' => 'id-123',
-               'parent_id' => 'parent-id',
-               'transaction_id' => 'transaction-id',
+               'parent_span_id' => 'parent-span-id',
                'start_time' => 123,
                'end_time' => 234,
            ],
@@ -56,7 +54,7 @@ class SpanTest extends TestCase
         $this->assertSame('some-type', $this->span->type());
         $this->assertSame('some-span', $this->span->name());
         $this->assertSame('id-123', $this->span->id());
-        $this->assertSame('parent-id', $this->span->parentId());
+        $this->assertSame('parent-span-id', $this->span->parentSpanId());
 
         $this->assertNull($this->span->endTime());
         $expectedStart = Timestamp::nowInMs();
@@ -132,11 +130,11 @@ class SpanTest extends TestCase
         $this->assertSame('foo-id', $this->span->id());
     }
 
-    public function test_set_parent_id()
+    public function test_set_parent_span_id()
     {
-        $result = $this->span->setParentId('foo-parent-id');
+        $result = $this->span->setParentSpanId('foo-parent-id');
         $this->assertSame($this->span, $result);
-        $this->assertSame('foo-parent-id', $this->span->parentId());
+        $this->assertSame('foo-parent-id', $this->span->parentSpanId());
     }
 
     public function test_set_start_time()
@@ -167,15 +165,13 @@ class SpanTest extends TestCase
         $this->span->setStartTime(123);
         $this->span->setEndTime(234);
         $this->span->tags()->set('foo', 'bar');
-        $this->transaction->shouldReceive('id')->andReturn('transaction-id');
 
         $expect = [
             'trace' => [
                 'type' => 'some-type',
                 'name' => 'some-span',
                 'id' => 'id-123',
-                'parent_id' => 'parent-id',
-                'transaction_id' => 'transaction-id',
+                'parent_span_id' => 'parent-span-id',
                 'start_time' => 123,
                 'end_time' => 234,
             ],
@@ -188,7 +184,6 @@ class SpanTest extends TestCase
 
     public function test_output_to_array_with_empty_objects()
     {
-        $this->transaction->shouldReceive('id')->andReturn('transaction-id');
         $this->span->tags()->replaceAll([]);
 
         $this->assertEquals(new stdClass(), $this->span->toArray()['tags']);

@@ -69,8 +69,7 @@ class TransactionTest extends TestCase
                         'type' => 'some-type',
                         'name' => 'some-span',
                         'id' => 'span-id',
-                        'parent_id' => 'span-parent-id',
-                        'transaction_id' => 'custom-transaction-id',
+                        'parent_span_id' => 'span-parent-id',
                         'start_time' => 123,
                         'end_time' => 234,
                     ],
@@ -166,11 +165,11 @@ class TransactionTest extends TestCase
         $this->assertSame('some-name', $span->name());
         $this->assertSame('some-type', $span->type());
         $this->assertNotEmpty($span->id());
-        $this->assertSame('id-123', $span->parentId());
+        $this->assertSame(null, $span->parentSpanId());
         $this->assertSame('id-123', $span->transaction()->id());
 
         $spanCustomParent = $this->transaction->newSpan('some-name', 'some-type', 'custom-id');
-        $this->assertSame('custom-id', $spanCustomParent->parentId());
+        $this->assertSame('custom-id', $spanCustomParent->parentSpanId());
         $this->assertSame('id-123', $spanCustomParent->transaction()->id());
 
         $this->assertSame([$span, $spanCustomParent], $this->transaction->spans());
@@ -182,7 +181,6 @@ class TransactionTest extends TestCase
         $this->assertSame(Span::TYPE_DATABASE, $span->type());
         $this->assertSame('some-name', $span->name());
         $this->assertNotEmpty($span->id());
-        $this->assertSame('id-123', $span->parentId());
     }
 
     public function test_new_cache_span()
@@ -191,7 +189,6 @@ class TransactionTest extends TestCase
         $this->assertSame(Span::TYPE_CACHE, $span->type());
         $this->assertSame('some-name', $span->name());
         $this->assertNotEmpty($span->id());
-        $this->assertSame('id-123', $span->parentId());
     }
 
     public function test_new_filesystem_span()
@@ -200,7 +197,6 @@ class TransactionTest extends TestCase
         $this->assertSame(Span::TYPE_FILESYSTEM, $span->type());
         $this->assertSame('some-name', $span->name());
         $this->assertNotEmpty($span->id());
-        $this->assertSame('id-123', $span->parentId());
     }
 
     public function test_output_to_array()
