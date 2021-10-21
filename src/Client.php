@@ -2,8 +2,6 @@
 
 namespace Tail;
 
-use GuzzleHttp\Client as Guzzle;
-
 class Client
 {
     public const LOGS_ENDPOINT = 'https://ingest.tail.dev/logs';
@@ -11,17 +9,13 @@ class Client
 
     protected $token;
 
-    /** @var Guzzle */
-    protected $guzzle;
-
     protected $logSendHandlers = [];
 
     protected $apmSendHandlers = [];
 
-    public function __construct($token, ?Guzzle $guzzle = null)
+    public function __construct($token)
     {
         $this->token = $token;
-        $this->guzzle = $guzzle ?? new Guzzle();
         $this->registerDefaultLogSendHandler();
         $this->registerDefaultApmSendHandler();
     }
@@ -65,17 +59,14 @@ class Client
     {
         $this->registerLogSendHandler(function (array $logs) {
             $url = getenv('TAIL_LOGS_ENDPOINT') ?: self::LOGS_ENDPOINT;
+            $headers = ['Authorization: Bearer ' . $this->token];
 
             $encodedLogs = array_map(function ($log) {
                 return json_encode($log);
             }, $logs);
+            $body = implode("\n", $encodedLogs);
 
-            $this->guzzle->post($url, [
-                'body' => implode("\n", $encodedLogs),
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token,
-                ],
-            ]);
+            $this->postRequest($url, $body, $headers);
         });
     }
 
@@ -83,13 +74,22 @@ class Client
     {
         $this->registerApmSendHandler(function ($transaction) {
             $url = getenv('TAIL_APM_ENDPOINT') ?: self::APM_ENDPOINT;
-
-            $this->guzzle->post($url, [
-                'body' => json_encode($transaction),
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token,
-                ],
-            ]);
+            $body = json_encode($transaction);
+            $headers = ['Authorization: Bearer ' . $this->token];
+            $this->postRequest($url, $body, $headers);
         });
+    }
+
+    private function postRequest(string $url, string $body, array $headers)
+    {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+
+        curl_exec($curl);
+        curl_close($curl);
     }
 }
