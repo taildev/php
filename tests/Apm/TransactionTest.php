@@ -3,6 +3,7 @@
 namespace Tests\Apm;
 
 use Mockery;
+use stdClass;
 use Tail\Apm\Span;
 use Tail\Apm\Support\Timestamp;
 use Tail\Apm\Transaction;
@@ -224,6 +225,8 @@ class TransactionTest extends TestCase
         $this->transaction->setStartTime(123.1);
         $this->transaction->setEndTime(234.2);
 
+        $this->transaction->tags()->set('foo', 'bar');
+
         $span1 = $this->transaction->newSpan('custom', '1')->setStartTime(2)->setEndTime(4);
         $span2 = $this->transaction->newSpan('custom', '2')->setStartTime(2)->setEndTime(4);
 
@@ -248,6 +251,13 @@ class TransactionTest extends TestCase
             ],
         ];
 
-        $this->assertSame($expect, $this->transaction->toArray());
+        $this->assertEquals($expect, $this->transaction->toArray());
+    }
+
+    public function test_output_to_array_with_empty_objects()
+    {
+        $this->transaction->tags()->replaceAll([]);
+
+        $this->assertEquals(new stdClass(), $this->transaction->toArray()['tags']);
     }
 }

@@ -3,7 +3,6 @@
 namespace Tail;
 
 use Tail\Meta\Agent;
-use Tail\Meta\Cookies;
 use Tail\Meta\Service;
 use Tail\Meta\System;
 use Tail\Meta\Tags;
@@ -24,9 +23,6 @@ class TailMeta
     /** @var Tags Custom metadata */
     protected $tags;
 
-    /** @var Cookies Custom metadata */
-    protected $cookies;
-
     /** @var User User metadata */
     protected $user;
 
@@ -36,7 +32,6 @@ class TailMeta
         $this->service = new Service();
         $this->system = new System();
         $this->tags = new Tags();
-        $this->cookies = new Cookies();
         $this->user = new User();
     }
 
@@ -81,16 +76,6 @@ class TailMeta
     }
 
     /**
-     * Get/set custom metadata
-     *
-     * @return Cookies
-     */
-    public function cookies(): Cookies
-    {
-        return $this->cookies;
-    }
-
-    /**
      * Get/set user metadata
      *
      * @return User
@@ -108,7 +93,6 @@ class TailMeta
             'system' => $this->system->toArray(),
             'tags' => $this->tags->toArray(),
             'user' => $this->user->toArray(),
-            'cookies' => $this->cookies->toArray(),
         ];
     }
 }

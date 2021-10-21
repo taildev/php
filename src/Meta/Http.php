@@ -2,6 +2,8 @@
 
 namespace Tail\Meta;
 
+use stdClass;
+
 class Http
 {
 
@@ -12,13 +14,13 @@ class Http
     protected $url;
 
     /** @var array Parameter values used in URL */
-    protected $urlParams;
+    protected $urlParams = [];
 
     /** @var array Headers for request */
-    protected $requestHeaders;
+    protected $requestHeaders = [];
 
     /** @var array Headers for response */
-    protected $responseHeaders;
+    protected $responseHeaders = [];
 
     /** @var int Response status */
     protected $responseStatus;
@@ -47,9 +49,6 @@ class Http
             'accept_encoding' => $this->getServerVar('HTTP_ACCEPT_ENCODING'),
             'accept_language' => $this->getServerVar('HTTP_ACCEPT_LANGUAGE'),
         ]));
-
-        parse_str($this->getServerVar('QUERY_STRING'), $queryArr);
-        $this->setUrlParams($queryArr);
     }
 
     /**
@@ -240,12 +239,27 @@ class Http
      */
     public function toArray(): array
     {
+        $urlParams = $this->urlParams();
+        if (count($urlParams) === 0) {
+            $urlParams = new stdClass();
+        }
+
+        $requestHeaders = $this->requestHeaders();
+        if (count($requestHeaders) === 0) {
+            $requestHeaders = new stdClass();
+        }
+
+        $responseHeaders = $this->responseHeaders();
+        if (count($responseHeaders) === 0) {
+            $responseHeaders = new stdClass();
+        }
+
         return [
             'method' => $this->method(),
             'url' => $this->url(),
-            'url_params' => $this->urlParams(),
-            'request_headers' => $this->requestHeaders(),
-            'response_headers' => $this->responseHeaders(),
+            'url_params' => $urlParams,
+            'request_headers' => $requestHeaders,
+            'response_headers' => $responseHeaders,
             'response_status' => $this->responseStatus(),
             'remote_address' => $this->remoteAddress(),
         ];

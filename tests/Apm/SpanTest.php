@@ -3,6 +3,7 @@
 namespace Tests\Apm;
 
 use Mockery;
+use stdClass;
 use Tail\Apm\Span;
 use Tests\TestCase;
 use Tail\Apm\Transaction;
@@ -184,6 +185,7 @@ class SpanTest extends TestCase
     {
         $this->span->setStartTime(123.1);
         $this->span->setEndTime(234.2);
+        $this->span->tags()->set('foo', 'bar');
         $this->transaction->shouldReceive('id')->andReturn('transaction-id');
 
         $expect = [
@@ -202,5 +204,13 @@ class SpanTest extends TestCase
         ];
 
         $this->assertSame($expect, $this->span->toArray());
+    }
+
+    public function test_output_to_array_with_empty_objects()
+    {
+        $this->transaction->shouldReceive('id')->andReturn('transaction-id');
+        $this->span->tags()->replaceAll([]);
+
+        $this->assertEquals(new stdClass(), $this->span->toArray()['tags']);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Meta;
 
+use stdClass;
 use Tail\Meta\Http;
 use Tests\TestCase;
 
@@ -156,5 +157,17 @@ class HttpTest extends TestCase
         ];
 
         $this->assertSame($expect, $http->toArray());
+    }
+
+    public function test_output_to_array_with_empty_objects()
+    {
+        $http = new Http();
+        $http->setUrlParams([]);
+        $http->setRequestHeaders([]);
+        $http->setResponseHeaders([]);
+
+        $this->assertEquals(new stdClass(), $http->toArray()['url_params']);
+        $this->assertEquals(new stdClass(), $http->toArray()['request_headers']);
+        $this->assertEquals(new stdClass(), $http->toArray()['response_headers']);
     }
 }

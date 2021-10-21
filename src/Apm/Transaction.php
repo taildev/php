@@ -2,6 +2,7 @@
 
 namespace Tail\Apm;
 
+use stdClass;
 use Tail\Meta\User;
 use Tail\Meta\Tags;
 use Tail\Meta\Http;
@@ -345,6 +346,11 @@ class Transaction
             $spanData[] = $span->toArray();
         }
 
+        $tags = $this->tags()->toArray();
+        if (count($tags) === 0) {
+            $tags = new stdClass();
+        }
+
         return [
             'trace' => [
                 'id' => $this->id(),
@@ -358,7 +364,7 @@ class Transaction
             'http' => $this->http()->toArray(),
             'service' => $this->service()->toArray(),
             'system' => $this->system()->toArray(),
-            'tags' => $this->tags()->toArray(),
+            'tags' => $tags,
             'user' => $this->user()->toArray(),
             'spans' => $spanData,
         ];

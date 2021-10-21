@@ -2,6 +2,7 @@
 
 namespace Tail\Apm;
 
+use stdClass;
 use Tail\Meta\Tags;
 use Tail\Meta\Database;
 use Tail\Apm\Support\Timestamp;
@@ -275,6 +276,11 @@ class Span
      */
     public function toArray(): array
     {
+        $tags = $this->tags()->toArray();
+        if (count($tags) === 0) {
+            $tags = new stdClass();
+        }
+
         return [
             'trace' => [
                 'type' => $this->type(),
@@ -287,7 +293,7 @@ class Span
                 'duration' => $this->duration(),
             ],
             'database' => $this->database()->toArray(),
-            'tags' => $this->tags()->toArray(),
+            'tags' => $tags,
         ];
     }
 }
