@@ -104,8 +104,12 @@ class Client
         $this->registerLogSendHandler(function (array $logs) {
             $url = getenv('TAIL_LOGS_ENDPOINT') ?: self::LOGS_ENDPOINT;
 
+            $encodedLogs = array_map(function ($log) {
+                return json_encode($log);
+            }, $logs);
+
             $this->guzzle->post($url, [
-                'json' => $logs,
+                'body' => implode("\n", $encodedLogs),
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token,
                 ],
@@ -119,7 +123,7 @@ class Client
             $url = getenv('TAIL_APM_ENDPOINT') ?: self::APM_ENDPOINT;
 
             $this->guzzle->post($url, [
-                'json' => $transaction,
+                'body' => json_encode($transaction),
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->token,
                 ],

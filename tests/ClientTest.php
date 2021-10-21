@@ -28,10 +28,12 @@ class ClientTest extends TestCase
             ['message' => "message \n2"],
         ];
 
+        $expectEncoded = "{\"message\":\"message 1\"}\n{\"message\":\"message \\n2\"}";
+
         $this->guzzle->shouldReceive('post')->with(
             Client::LOGS_ENDPOINT,
             [
-                'json' => $logs,
+                'body' => $expectEncoded,
                 'headers' => [
                     'Authorization' => 'Bearer secret_token',
                 ],
@@ -71,11 +73,12 @@ class ClientTest extends TestCase
     public function test_send_apm()
     {
         $transaction = ['some' => 'data'];
+        $expectEncoded = "{\"some\":\"data\"}";
 
         $this->guzzle->shouldReceive('post')->with(
             Client::APM_ENDPOINT,
             [
-                'json' => $transaction,
+                'body' => $expectEncoded,
                 'headers' => [
                     'Authorization' => 'Bearer secret_token',
                 ],
