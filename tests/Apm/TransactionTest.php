@@ -32,9 +32,8 @@ class TransactionTest extends TestCase
                 'id' => 'custom-transaction-id',
                 'type' => Transaction::TYPE_JOB,
                 'name' => 'custom-name',
-                'start_time' => 123.1,
-                'end_time' => 456.2,
-                'duration' => 333.1,
+                'start_time' => 123,
+                'end_time' => 456,
             ],
             'agent' => [
                 'name' => 'custom-agent-name',
@@ -72,9 +71,8 @@ class TransactionTest extends TestCase
                         'id' => 'span-id',
                         'parent_id' => 'span-parent-id',
                         'transaction_id' => 'custom-transaction-id',
-                        'start_time' => 123.4,
-                        'end_time' => 234.5,
-                        'duration' => 111.1,
+                        'start_time' => 123,
+                        'end_time' => 234,
                     ],
                     'database' => [
                         'name' => 'custom-db-name',
@@ -98,7 +96,7 @@ class TransactionTest extends TestCase
 
         $this->assertNull($this->transaction->endTime());
         $expectedStart = Timestamp::nowInMs();
-        $this->assertEqualsWithDelta($expectedStart, $this->transaction->startTime(), 50);
+        $this->assertEqualsWithDelta($expectedStart, $this->transaction->startTime(), 5);
 
         $this->assertNotEmpty($this->transaction->service());
         $this->assertNotEmpty($this->transaction->agent());
@@ -132,31 +130,16 @@ class TransactionTest extends TestCase
 
     public function test_set_start_time()
     {
-        $result = $this->transaction->setStartTime(123.4);
+        $result = $this->transaction->setStartTime(123);
         $this->assertSame($this->transaction, $result);
-        $this->assertSame(123.4, $this->transaction->startTime());
+        $this->assertSame(123, $this->transaction->startTime());
     }
 
     public function test_set_end_time()
     {
-        $result = $this->transaction->setEndTime(234.5);
+        $result = $this->transaction->setEndTime(234);
         $this->assertSame($this->transaction, $result);
-        $this->assertSame(234.5, $this->transaction->endTime());
-    }
-
-    public function test_get_duration()
-    {
-        $this->transaction->setStartTime(22.4);
-        $this->transaction->setEndTime(28.2);
-        $this->assertSame(5.8, $this->transaction->duration());
-    }
-
-    public function test_get_duration_uses_current_time_if_end_is_not_specified()
-    {
-        $start = Timestamp::nowInMs() - 24;
-        $this->transaction->setStartTime($start);
-        $this->transaction->setEndTime(null);
-        $this->assertEqualsWithDelta(24, $this->transaction->duration(), 5);
+        $this->assertSame(234, $this->transaction->endTime());
     }
 
     public function test_finish()
@@ -222,8 +205,8 @@ class TransactionTest extends TestCase
 
     public function test_output_to_array()
     {
-        $this->transaction->setStartTime(123.1);
-        $this->transaction->setEndTime(234.2);
+        $this->transaction->setStartTime(123);
+        $this->transaction->setEndTime(234);
 
         $this->transaction->tags()->set('foo', 'bar');
 
@@ -235,9 +218,8 @@ class TransactionTest extends TestCase
                 'id' => 'id-123',
                 'type' => Transaction::TYPE_REQUEST,
                 'name' => 'some-transaction',
-                'start_time' => 123.1,
-                'end_time' => 234.2,
-                'duration' => 111.1,
+                'start_time' => 123,
+                'end_time' => 234,
             ],
             'agent' => $this->transaction->agent()->toArray(),
             'http' => $this->transaction->http()->toArray(),

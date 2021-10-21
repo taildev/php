@@ -10,7 +10,7 @@ class TimestampTest extends TestCase
 
     public function test_now_in_ms()
     {
-        $expected = microtime(true) * 1000;
+        $expected = ceil(microtime(true) * 1000);
         $actual = Timestamp::nowInMs();
         $tolerance = $actual - $expected;
         $this->assertEqualsWithDelta($expected, $actual, $tolerance);

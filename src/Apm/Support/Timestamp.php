@@ -8,8 +8,8 @@ class Timestamp
     /**
      * Current timestamp in milliseconds since epoch
      */
-    public static function nowInMs(): float
+    public static function nowInMs(): int
     {
-        return microtime(true) * 1000;
+        return ceil(microtime(true) * 1000);
     }
 }

@@ -35,9 +35,8 @@ class SpanTest extends TestCase
                'id' => 'id-123',
                'parent_id' => 'parent-id',
                'transaction_id' => 'transaction-id',
-               'start_time' => 123.1,
-               'end_time' => 234.2,
-               'duration' => 111.1,
+               'start_time' => 123,
+               'end_time' => 234,
            ],
            'database' => [
                'name' => 'some-database',
@@ -61,7 +60,7 @@ class SpanTest extends TestCase
 
         $this->assertNull($this->span->endTime());
         $expectedStart = Timestamp::nowInMs();
-        $this->assertEqualsWithDelta($expectedStart, $this->span->startTime(), 50);
+        $this->assertEqualsWithDelta($expectedStart, $this->span->startTime(), 5);
 
         $this->assertNotEmpty($this->span->database());
         $this->assertNotEmpty($this->span->tags());
@@ -142,34 +141,16 @@ class SpanTest extends TestCase
 
     public function test_set_start_time()
     {
-        $result = $this->span->setStartTime(123.4);
+        $result = $this->span->setStartTime(123);
         $this->assertSame($this->span, $result);
-        $this->assertSame(123.4, $this->span->startTime());
+        $this->assertSame(123, $this->span->startTime());
     }
 
     public function test_set_end_time()
     {
-        $result = $this->span->setEndTime(234.5);
+        $result = $this->span->setEndTime(234);
         $this->assertSame($this->span, $result);
-        $this->assertSame(234.5, $this->span->endTime());
-    }
-
-    public function test_get_duration()
-    {
-        $now = Timestamp::nowInMs();
-        $start = $now - 24;
-        $this->span->setStartTime($start);
-        $this->span->setEndTime($now);
-
-        $this->assertSame(24.0, $this->span->duration());
-    }
-
-    public function test_get_duration_defaults_to_using_now_as_end_time()
-    {
-        $start = Timestamp::nowInMs() - 24;
-        $this->span->setStartTime($start);
-        $this->span->setEndTime(null);
-        $this->assertEqualsWithDelta(24.0, $this->span->duration(), 5);
+        $this->assertSame(234, $this->span->endTime());
     }
 
     public function test_finish()
@@ -178,13 +159,13 @@ class SpanTest extends TestCase
         $this->assertSame($this->span, $result);
 
         $expectedFinishTime = Timestamp::nowInMs();
-        $this->assertEqualsWithDelta($expectedFinishTime, $this->span->endTime(), 10);
+        $this->assertEqualsWithDelta($expectedFinishTime, $this->span->endTime(), 5);
     }
 
     public function test_output_to_array()
     {
-        $this->span->setStartTime(123.1);
-        $this->span->setEndTime(234.2);
+        $this->span->setStartTime(123);
+        $this->span->setEndTime(234);
         $this->span->tags()->set('foo', 'bar');
         $this->transaction->shouldReceive('id')->andReturn('transaction-id');
 
@@ -195,9 +176,8 @@ class SpanTest extends TestCase
                 'id' => 'id-123',
                 'parent_id' => 'parent-id',
                 'transaction_id' => 'transaction-id',
-                'start_time' => 123.1,
-                'end_time' => 234.2,
-                'duration' => 111.1,
+                'start_time' => 123,
+                'end_time' => 234,
             ],
             'database' => $this->span->database()->toArray(),
             'tags' => $this->span->tags()->toArray(),

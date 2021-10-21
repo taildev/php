@@ -27,10 +27,10 @@ class Transaction
     /** @var string|null Name to identify transaction */
     protected $name;
 
-    /** @var float Start time as milliseconds since epoch */
+    /** @var int Start time as milliseconds since epoch */
     protected $startTime;
 
-    /** @var float End time as milliseconds since epoch */
+    /** @var int End time as milliseconds since epoch */
     protected $endTime;
 
     /** @var Agent Meta information for transaction agent */
@@ -182,7 +182,7 @@ class Transaction
     /**
      * Get the transaction start time, represented as milliseconds since the epoch.
      */
-    public function startTime(): float
+    public function startTime(): int
     {
         return $this->startTime;
     }
@@ -190,7 +190,7 @@ class Transaction
     /**
      * Set the transaction start time, represented as milliseconds since the epoch.
      */
-    public function setStartTime(float $startTime): Transaction
+    public function setStartTime(int $startTime): Transaction
     {
         $this->startTime = $startTime;
         return $this;
@@ -200,7 +200,7 @@ class Transaction
      * Get the transactions end time, represented as milliseconds since the epoch. If transaction has not ended,
      * this will return null.
      */
-    public function endTime(): ?float
+    public function endTime(): ?int
     {
         return $this->endTime;
     }
@@ -208,26 +208,16 @@ class Transaction
     /**
      * Set the end time for the transaction represented as milliseconds since the epoch.
      */
-    public function setEndTime(?float $endTime): Transaction
+    public function setEndTime(?int $endTime): Transaction
     {
         $this->endTime = $endTime;
         return $this;
     }
 
     /**
-     * Get the duration of the transaction in milliseconds. If end_time is not specified,
-     * duration will be the start_time until now.
-     */
-    public function duration(): float
-    {
-        $end = $this->endTime() ?: Timestamp::nowInMs();
-        return $end - $this->startTime();
-    }
-
-    /**
      * Mark transaction as finished now, or with the optional time provided as milliseconds since epoch.
      */
-    public function finish(?float $at = null): Transaction
+    public function finish(?int $at = null): Transaction
     {
         $at = $at ?: Timestamp::nowInMs();
         $this->setEndTime($at);
@@ -358,7 +348,6 @@ class Transaction
                 'name' => $this->name(),
                 'start_time' => $this->startTime(),
                 'end_time' => $this->endTime(),
-                'duration' => $this->duration(),
             ],
             'agent' => $this->agent()->toArray(),
             'http' => $this->http()->toArray(),

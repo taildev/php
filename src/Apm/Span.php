@@ -30,10 +30,10 @@ class Span
     /** @var string ID that span belongs to, may be another span or the transaction ID */
     protected $parentId;
 
-    /** @var float Start time as milliseconds since epoch */
+    /** @var int Start time as milliseconds since epoch */
     protected $startTime;
 
-    /** @var float End time as milliseconds since epoch */
+    /** @var int End time as milliseconds since epoch */
     protected $endTime;
 
     /** @var Database Meta information for a span that tracks a  database call */
@@ -205,7 +205,7 @@ class Span
     /**
      * Get the start time as milliseconds since epoch
      */
-    public function startTime(): float
+    public function startTime(): int
     {
         return $this->startTime;
     }
@@ -213,7 +213,7 @@ class Span
     /**
      * Set start time for span as milliseconds since epoch
      */
-    public function setStartTime(float $startTime): Span
+    public function setStartTime(int $startTime): Span
     {
         $this->startTime = $startTime;
         return $this;
@@ -222,7 +222,7 @@ class Span
     /**
      * Get the end time for the span as milliseconds since epoch
      */
-    public function endTime(): ?float
+    public function endTime(): ?int
     {
         return $this->endTime;
     }
@@ -230,26 +230,16 @@ class Span
     /**
      * Set the end time for the span as milliseconds since epoch
      */
-    public function setEndTime(?float $endTime): Span
+    public function setEndTime(?int $endTime): Span
     {
         $this->endTime = $endTime;
         return $this;
     }
 
     /**
-     * Get the duration of the span in milliseconds. If end_time is not specified,
-     * duration will be the start_time until now.
-     */
-    public function duration(): float
-    {
-        $end = $this->endTime() ?: Timestamp::nowInMs();
-        return $end - $this->startTime();
-    }
-
-    /**
      * Mark the span as finished now, or with the provided custom time (represented as milliseconds since epoch).
      */
-    public function finish(?float $at = null): Span
+    public function finish(?int $at = null): Span
     {
         $at = $at ?: Timestamp::nowInMs();
         return $this->setEndTime($at);
@@ -290,7 +280,6 @@ class Span
                 'transaction_id' => $this->transaction()->id(),
                 'start_time' => $this->startTime(),
                 'end_time' => $this->endTime(),
-                'duration' => $this->duration(),
             ],
             'database' => $this->database()->toArray(),
             'tags' => $tags,

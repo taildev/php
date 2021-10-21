@@ -64,15 +64,15 @@ class ApmTest extends TestCase
     public function test_set_start_time_sets_transactions_start_time()
     {
         Apm::startCustom('foo');
-        Apm::setStartTime(123.456);
-        $this->assertSame(123.456, Apm::transaction()->startTime());
+        Apm::setStartTime(123);
+        $this->assertSame(123, Apm::transaction()->startTime());
     }
 
     public function test_set_end_time_sets_transactions_end_time()
     {
         Apm::startCustom('foo');
-        Apm::setEndTime(123.456);
-        $this->assertSame(123.456, Apm::transaction()->endTime());
+        Apm::setEndTime(123);
+        $this->assertSame(123, Apm::transaction()->endTime());
     }
 
     public function test_new_span_creates_new_span_for_transaction()

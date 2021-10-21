@@ -62,6 +62,6 @@ class TailServiceProvider extends ServiceProvider
     protected function startApm()
     {
         $start = defined('LARAVEL_START') ? LARAVEL_START : microtime(true);
-        Apm::startCustom('_ignore')->setStartTime($start * 1000);
+        Apm::startCustom('_ignore')->setStartTime(ceil($start * 1000));
     }
 }
