@@ -6,7 +6,6 @@ use GuzzleHttp\Client as Guzzle;
 
 class Client
 {
-    public const ERRORS_ENDPOINT = 'https://api.tail.dev/ingest/errors';
     public const LOGS_ENDPOINT = 'https://ingest.tail.dev/logs';
     public const APM_ENDPOINT = 'https://ingest.tail.dev/traces';
 
@@ -14,8 +13,6 @@ class Client
 
     /** @var Guzzle */
     protected $guzzle;
-
-    protected $errorSendHandlers = [];
 
     protected $logSendHandlers = [];
 
@@ -25,13 +22,8 @@ class Client
     {
         $this->token = $token;
         $this->guzzle = $guzzle ?? new Guzzle();
-        $this->registerDefaultErrorSendHandler();
         $this->registerDefaultLogSendHandler();
         $this->registerDefaultApmSendHandler();
-    }
-    public function registerErrorSendHandler($handler)
-    {
-        $this->errorSendHandlers[] = $handler;
     }
 
     public function registerLogSendHandler($handler)
@@ -42,16 +34,6 @@ class Client
     public function registerApmSendHandler($handler)
     {
         $this->apmSendHandlers[] = $handler;
-    }
-
-    public function sendErrors(array $errors)
-    {
-        $handlers = array_reverse($this->errorSendHandlers);
-        foreach ($handlers as $handler) {
-            if ($handler($errors) === false) {
-                return;
-            }
-        }
     }
 
     public function sendLogs(array $logs)
@@ -74,29 +56,9 @@ class Client
         }
     }
 
-    // @todo remove
-    public function getToken()
-    {
-        return $this->token;
-    }
-
     public function token()
     {
         return $this->token;
-    }
-
-    private function registerDefaultErrorSendHandler()
-    {
-        $this->registerErrorSendHandler(function (array $errors) {
-            $url = getenv('TAIL_ERRORS_ENDPOINT') ?: self::ERRORS_ENDPOINT;
-
-            $this->guzzle->post($url, [
-                'json' => $errors,
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->token,
-                ],
-            ]);
-        });
     }
 
     private function registerDefaultLogSendHandler()

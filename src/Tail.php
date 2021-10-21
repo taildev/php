@@ -16,9 +16,6 @@ class Tail
     /** @var bool */
     protected static $logsEnabled;
 
-    /** @var bool */
-    protected static $errorsEnabled;
-
     /** @var string */
     protected static $service;
 
@@ -36,7 +33,6 @@ class Tail
         static::$meta = new TailMeta();
         static::$apmEnabled = static::shouldEnableApm($config);
         static::$logsEnabled = static::shouldEnableLogs($config);
-        static::$errorsEnabled = static::shouldEnableErrors($config);
         static::$meta->service()->setName(static::serviceName($config));
         static::$meta->service()->setEnvironment(static::environmentName($config));
 
@@ -91,21 +87,6 @@ class Tail
         return $enable;
     }
 
-    protected static function shouldEnableErrors(array $config)
-    {
-        $enable = true;
-
-        if (Env::get('TAIL_ERRORS_ENABLED') !== null) {
-            $enable = Env::get('TAIL_ERRORS_ENABLED');
-        }
-
-        if (array_key_exists('errors_enabled', $config)) {
-            $enable = $config['errors_enabled'];
-        }
-
-        return $enable;
-    }
-
     protected static function serviceName(array $config)
     {
         $name = Env::get('TAIL_SERVICE') ?? 'Unknown';
@@ -132,7 +113,6 @@ class Tail
     {
         Apm::finish();
         Log::flush();
-        Error::send();
     }
 
     /**
@@ -201,34 +181,6 @@ class Tail
     public static function enableLogs()
     {
         static::$logsEnabled = true;
-    }
-
-    /**
-     * @return bool
-     */
-    public static function errorsEnabled()
-    {
-        if (!static::$initialized) {
-            static::init();
-        }
-
-        return static::$errorsEnabled;
-    }
-
-    /**
-     * Set errors to be disabled
-     */
-    public static function disableErrors()
-    {
-        static::$errorsEnabled = false;
-    }
-
-    /**
-     * Set errors to be enabled
-     */
-    public static function enableErrors()
-    {
-        static::$errorsEnabled = true;
     }
 
     /**
