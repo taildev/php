@@ -16,11 +16,11 @@ class User
      */
     public function fillFromArray(array $properties): User
     {
-        if (array_key_exists('id', $properties)) {
+        if (isset($properties['id'])) {
             $this->setId($properties['id']);
         }
 
-        if (array_key_exists('email', $properties)) {
+        if (isset($properties['email'])) {
             $this->setEmail($properties['email']);
         }
 
@@ -69,11 +69,11 @@ class User
      */
     public function merge(array $meta)
     {
-        if (array_key_exists('id', $meta)) {
+        if (isset($meta['id'])) {
             $this->id = $meta['id'];
         }
 
-        if (array_key_exists('email', $meta)) {
+        if (isset($meta['email'])) {
             $this->email = $meta['email'];
         }
 

@@ -16,11 +16,11 @@ class Database
      */
     public function fillFromArray(array $properties): Database
     {
-        if (array_key_exists('name', $properties)) {
+        if (isset($properties['name'])) {
             $this->setName($properties['name']);
         }
 
-        if (array_key_exists('query', $properties)) {
+        if (isset($properties['query'])) {
             $this->setQuery($properties['query']);
         }
 

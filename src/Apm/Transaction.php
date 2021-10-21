@@ -65,12 +65,12 @@ class Transaction
         $type = $trace['type'];
         $name = $trace['name'];
         $startTime = $trace['start_time'];
-        $endTime = array_key_exists('end_time', $trace) ? $trace['end_time'] : null;
+        $endTime = isset($trace['end_time']) ? $trace['end_time'] : null;
 
         # service properties
         $service = $properties['service'];
-        $serviceName = array_key_exists('name', $service) ? $service['name'] : null;
-        $environment = array_key_exists('environment', $service) ? $service['environment'] : null;
+        $serviceName = isset($service['name']) ? $service['name'] : null;
+        $environment = isset($service['environment']) ? $service['environment'] : null;
 
         # create transaction
         $transaction = new Transaction($id, $type, $name);
@@ -80,27 +80,27 @@ class Transaction
         $transaction->service()->setEnvironment($environment);
 
         # agent properties
-        $agent = array_key_exists('agent', $properties) ? $properties['agent'] : [];
+        $agent = isset($properties['agent']) ? $properties['agent'] : [];
         $transaction->agent()->fillFromArray($agent);
 
         # http properties
-        $http = array_key_exists('http', $properties) ? $properties['http'] : [];
+        $http = isset($properties['http']) ? $properties['http'] : [];
         $transaction->http()->fillFromArray($http);
 
         # system properties
-        $system = array_key_exists('system', $properties) ? $properties['system'] : [];
+        $system = isset($properties['system']) ? $properties['system'] : [];
         $transaction->system()->fillFromArray($system);
 
         # tags
-        $tags = array_key_exists('tags', $properties) ? $properties['tags'] : [];
+        $tags = isset($properties['tags']) ? $properties['tags'] : [];
         $transaction->tags()->replaceAll($tags);
 
         # user properties
-        $user = array_key_exists('user', $properties) ? $properties['user'] : [];
+        $user = isset($properties['user']) ? $properties['user'] : [];
         $transaction->user()->fillFromArray($user);
 
         # spans
-        $spans = array_key_exists('spans', $properties) ? $properties['spans'] : [];
+        $spans = isset($properties['spans']) ? $properties['spans'] : [];
         foreach ($spans as $spanProperties) {
             $span = Span::createFromArray($transaction, $spanProperties);
             $transaction->pushSpan($span);

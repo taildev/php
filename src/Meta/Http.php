@@ -56,31 +56,31 @@ class Http
      */
     public function fillFromArray(array $properties): Http
     {
-        if (array_key_exists('method', $properties)) {
+        if (isset($properties['method'])) {
             $this->setMethod($properties['method']);
         };
 
-        if (array_key_exists('url', $properties)) {
+        if (isset($properties['url'])) {
             $this->setUrl($properties['url']);
         }
 
-        if (array_key_exists('remote_address', $properties)) {
+        if (isset($properties['remote_address'])) {
             $this->setRemoteAddress($properties['remote_address']);
         }
 
-        if (array_key_exists('url_params', $properties)) {
+        if (isset($properties['url_params'])) {
             $this->setUrlParams($properties['url_params']);
         }
 
-        if (array_key_exists('request_headers', $properties)) {
+        if (isset($properties['request_headers'])) {
             $this->setRequestHeaders($properties['request_headers']);
         }
 
-        if (array_key_exists('response_headers', $properties)) {
+        if (isset($properties['response_headers'])) {
             $this->setResponseHeaders($properties['response_headers']);
         }
 
-        if (array_key_exists('response_status', $properties)) {
+        if (isset($properties['response_status'])) {
             $this->setResponseStatus($properties['response_status']);
         }
 

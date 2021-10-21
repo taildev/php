@@ -50,7 +50,7 @@ class Tail
             $token = Env::get('TAIL_CLIENT_TOKEN');
         }
 
-        if (array_key_exists('client_token', $config)) {
+        if (isset($config['client_token'])) {
             $token = $config['client_token'];
         }
 
@@ -65,7 +65,7 @@ class Tail
             $enable = Env::get('TAIL_APM_ENABLED');
         }
 
-        if (array_key_exists('apm_enabled', $config)) {
+        if (isset($config['apm_enabled'])) {
             $enable = $config['apm_enabled'];
         }
 
@@ -80,7 +80,7 @@ class Tail
             $enable = Env::get('TAIL_LOGS_ENABLED');
         }
 
-        if (array_key_exists('logs_enabled', $config)) {
+        if (isset($config['logs_enabled'])) {
             $enable = $config['logs_enabled'];
         }
 
@@ -91,7 +91,7 @@ class Tail
     {
         $name = Env::get('TAIL_SERVICE') ?? 'Unknown';
 
-        if (array_key_exists('service', $config)) {
+        if (isset($config['service'])) {
             $name = $config['service'];
         }
 
@@ -102,7 +102,7 @@ class Tail
     {
         $name = Env::get('TAIL_ENV') ?? 'Default';
 
-        if (array_key_exists('environment', $config)) {
+        if (isset($config['environment'])) {
             $name = $config['environment'];
         }
 

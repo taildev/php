@@ -9,7 +9,7 @@ class Env
     {
         $value = null;
 
-        if (array_key_exists($key, $_SERVER)) {
+        if (isset($_SERVER[$key])) {
             $value = $_SERVER[$key];
         }
 

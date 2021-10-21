@@ -18,7 +18,7 @@ class System
      */
     public function fillFromArray(array $properties): System
     {
-        if (array_key_exists('hostname', $properties)) {
+        if (isset($properties['hostname'])) {
             $this->setHostname($properties['hostname']);
         }
 
@@ -50,7 +50,7 @@ class System
      */
     public function merge(array $meta)
     {
-        if (array_key_exists('hostname', $meta)) {
+        if (isset($meta['hostname'])) {
             $this->hostname = $meta['hostname'];
         }
 

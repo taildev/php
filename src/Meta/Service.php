@@ -67,11 +67,11 @@ class Service
      */
     public function merge(array $meta)
     {
-        if (array_key_exists('name', $meta)) {
+        if (isset($meta['name'])) {
             $this->name = $meta['name'];
         }
 
-        if (array_key_exists('environment', $meta)) {
+        if (isset($meta['environment'])) {
             $this->environment = $meta['environment'];
         }
 

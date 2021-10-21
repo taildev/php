@@ -14,7 +14,7 @@ class TailMonologHandler extends AbstractProcessingHandler
         $message = $record['message'];
         $context = [];
 
-        if (array_key_exists('context', $record)) {
+        if (isset($record['context'])) {
             $context = $record['context'];
         }
 

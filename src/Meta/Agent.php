@@ -40,15 +40,15 @@ class Agent
      */
     public function fillFromArray(array $properties): Agent
     {
-        if (array_key_exists('name', $properties)) {
+        if (isset($properties['name'])) {
             $this->setName($properties['name']);
         };
 
-        if (array_key_exists('type', $properties)) {
+        if (isset($properties['type'])) {
             $this->setType($properties['type']);
         };
 
-        if (array_key_exists('version', $properties)) {
+        if (isset($properties['version'])) {
             $this->setVersion($properties['version']);
         };
 
@@ -129,15 +129,15 @@ class Agent
      */
     public function merge(array $meta)
     {
-        if (array_key_exists('name', $meta)) {
+        if (isset($meta['name'])) {
             $this->name = $meta['name'];
         }
 
-        if (array_key_exists('type', $meta)) {
+        if (isset($meta['type'])) {
             $this->type = $meta['type'];
         }
 
-        if (array_key_exists('version', $meta)) {
+        if (isset($meta['version'])) {
             $this->version = $meta['version'];
         }
 

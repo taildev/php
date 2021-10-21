@@ -34,7 +34,7 @@ class Tags
      */
     public function get(string $key)
     {
-        if (array_key_exists($key, $this->tags)) {
+        if (isset($this->tags[$key])) {
             return $this->tags[$key];
         }
 
