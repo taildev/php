@@ -32,7 +32,7 @@ class TailMonologHandlerTest extends TestCase
         $this->handler->write($record);
         $this->assertSame($record['message'], Log::$logs[0]['message']);
         $this->assertSame($record['level_name'], Log::$logs[0]['level']);
-        $this->assertSame($record['context'], Log::$logs[0]['context']);
+        $this->assertSame($record['context'], Log::$logs[0]['tags']);
     }
 
     public function test_close()

@@ -28,14 +28,14 @@ class LogTest extends TestCase
         $log1 = Log::$logs[0];
         $this->assertSame('info', $log1['level']);
         $this->assertSame('My info message', $log1['message']);
-        $this->assertSame(['number' => 1], $log1['context']);
-        $this->assertEqualsWithDelta($expectedTime, strtotime($log1['time']), 1);
+        $this->assertSame(['number' => 1], $log1['tags']);
+        $this->assertEqualsWithDelta($expectedTime, strtotime($log1['@timestamp']), 1);
 
         $log2 = Log::$logs[1];
         $this->assertSame('debug', $log2['level']);
         $this->assertSame('My debug message', $log2['message']);
-        $this->assertSame(['number' => 2], $log2['context']);
-        $this->assertEqualsWithDelta($expectedTime, strtotime($log2['time']), 1);
+        $this->assertSame(['number' => 2], $log2['tags']);
+        $this->assertEqualsWithDelta($expectedTime, strtotime($log2['@timestamp']), 1);
     }
 
     public function test_flush_logs()
@@ -75,17 +75,30 @@ class LogTest extends TestCase
 
     public function test_flush_logs_attaches_metadata_to_each_record()
     {
-        Log::debug('message 1');
-        Log::info('message 2');
-
-        $expected = array_map(function ($log) {
-            return array_merge($log, Tail::meta()->toArray());
-        }, Log::$logs);
-
         Tail::init(['logs_enabled' => true]);
         $client = Mockery::mock(Client::class);
-        $client->shouldReceive('sendLogs')->with($expected)->once();
         Tail::setClient($client);
+
+        Log::$logs = [];
+        Log::debug('message 1', ['tag1' => 1, 'tag2' => 2]);
+        Log::info('message 2');
+
+        Tail::meta()->tags()->replaceAll(['tag1' => 'different']);
+        Tail::meta()->service()->merge(['name' => 'service_name', 'environment' => 'testing']);
+        Tail::meta()->system()->merge(['hostname' => 'foo-host']);
+
+        $expectLog1 = array_merge(Log::$logs[0], [
+            'tags' => ['tag1' => 1, 'tag2' => 2],
+            'service' => ['name' => 'service_name', 'environment' => 'testing'],
+            'system' => ['hostname' => 'foo-host'],
+        ]);
+        $expectLog2 = array_merge(Log::$logs[1], [
+            'tags' => ['tag1' => 'different'],
+            'service' => ['name' => 'service_name', 'environment' => 'testing'],
+            'system' => ['hostname' => 'foo-host'],
+        ]);
+
+        $client->shouldReceive('sendLogs')->with([$expectLog1, $expectLog2])->once();
 
         Log::flush();
     }
@@ -103,34 +116,34 @@ class LogTest extends TestCase
 
         $this->assertSame('emergency', Log::$logs[0]['level']);
         $this->assertSame('em', Log::$logs[0]['message']);
-        $this->assertSame(['number' => 1], Log::$logs[0]['context']);
+        $this->assertSame(['number' => 1], Log::$logs[0]['tags']);
 
         $this->assertSame('alert', Log::$logs[1]['level']);
         $this->assertSame('al', Log::$logs[1]['message']);
-        $this->assertSame(['number' => 2], Log::$logs[1]['context']);
+        $this->assertSame(['number' => 2], Log::$logs[1]['tags']);
 
         $this->assertSame('critical', Log::$logs[2]['level']);
         $this->assertSame('cr', Log::$logs[2]['message']);
-        $this->assertSame(['number' => 3], Log::$logs[2]['context']);
+        $this->assertSame(['number' => 3], Log::$logs[2]['tags']);
 
         $this->assertSame('error', Log::$logs[3]['level']);
         $this->assertSame('er', Log::$logs[3]['message']);
-        $this->assertSame(['number' => 4], Log::$logs[3]['context']);
+        $this->assertSame(['number' => 4], Log::$logs[3]['tags']);
 
         $this->assertSame('warning', Log::$logs[4]['level']);
         $this->assertSame('wa', Log::$logs[4]['message']);
-        $this->assertSame(['number' => 5], Log::$logs[4]['context']);
+        $this->assertSame(['number' => 5], Log::$logs[4]['tags']);
 
         $this->assertSame('notice', Log::$logs[5]['level']);
         $this->assertSame('no', Log::$logs[5]['message']);
-        $this->assertSame(['number' => 6], Log::$logs[5]['context']);
+        $this->assertSame(['number' => 6], Log::$logs[5]['tags']);
 
         $this->assertSame('info', Log::$logs[6]['level']);
         $this->assertSame('in', Log::$logs[6]['message']);
-        $this->assertSame(['number' => 7], Log::$logs[6]['context']);
+        $this->assertSame(['number' => 7], Log::$logs[6]['tags']);
 
         $this->assertSame('debug', Log::$logs[7]['level']);
         $this->assertSame('de', Log::$logs[7]['message']);
-        $this->assertSame(['number' => 8], Log::$logs[7]['context']);
+        $this->assertSame(['number' => 8], Log::$logs[7]['tags']);
     }
 }

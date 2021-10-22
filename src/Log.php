@@ -7,53 +7,53 @@ class Log
 
     public static $logs = [];
 
-    public static function emergency($message, array $context = [])
+    public static function emergency(string $message, array $tags = [])
     {
-        static::log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $tags);
     }
 
-    public static function alert($message, array $context = [])
+    public static function alert(string $message, array $tags = [])
     {
-        static::log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $tags);
     }
 
-    public static function critical($message, array $context = [])
+    public static function critical(string $message, array $tags = [])
     {
-        static::log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $tags);
     }
 
-    public static function error($message, array $context = [])
+    public static function error(string $message, array $tags = [])
     {
-        static::log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $tags);
     }
 
-    public static function warning($message, array $context = [])
+    public static function warning(string $message, array $tags = [])
     {
-        static::log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $tags);
     }
 
-    public static function notice($message, array $context = [])
+    public static function notice(string $message, array $tags = [])
     {
-        static::log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $tags);
     }
 
-    public static function info($message, array $context = [])
+    public static function info(string $message, array $tags = [])
     {
-        static::log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $tags);
     }
 
-    public static function debug($message, array $context = [])
+    public static function debug(string $message, array $tags = [])
     {
-        static::log(__FUNCTION__, $message, $context);
+        static::log(__FUNCTION__, $message, $tags);
     }
 
-    public static function log($level, $message, array $context = [])
+    public static function log(string $level, string $message, array $tags = [])
     {
         $log = [
-            'level' => $level,
+            '@timestamp' => gmdate(DATE_ATOM),
             'message' => $message,
-            'context' => $context,
-            'time' => gmdate(DATE_ATOM),
+            'level' => $level,
+            'tags' => $tags,
         ];
 
         static::$logs[] = $log;
@@ -79,7 +79,12 @@ class Log
     protected static function logsWithMetadata()
     {
         return array_map(function ($log) {
-            return array_merge($log, Tail::meta()->toArray());
+            $tags = array_merge(Tail::meta()->tags()->all(), $log['tags']);
+            return array_merge($log, [
+                'tags' => $tags,
+                'service' => Tail::meta()->service()->toArray(),
+                'system' => Tail::meta()->system()->toArray(),
+            ]);
         }, static::$logs);
     }
 }
