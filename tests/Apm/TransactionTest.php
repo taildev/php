@@ -3,7 +3,6 @@
 namespace Tests\Apm;
 
 use Mockery;
-use stdClass;
 use Tail\Apm\Span;
 use Tail\Apm\Support\Timestamp;
 use Tail\Apm\Transaction;
@@ -35,6 +34,25 @@ class TransactionTest extends TestCase
                 'start_time' => 123,
                 'end_time' => 456,
             ],
+            'spans' => [
+                [
+                    'trace' => [
+                        'type' => 'some-type',
+                        'name' => 'some-span',
+                        'id' => 'span-id',
+                        'start_time' => 123,
+                        'end_time' => 234,
+                        'parent_span_id' => 'span-parent-id',
+                    ],
+                    'database' => [
+                        'name' => 'custom-db-name',
+                        'query' => 'custom-db-query',
+                    ],
+                    'tags' => [
+                        'span-foo' => 'span-bar',
+                    ],
+                ],
+            ],
             'agent' => [
                 'name' => 'custom-agent-name',
                 'type' => 'custom-agent-type',
@@ -63,28 +81,9 @@ class TransactionTest extends TestCase
                 'id' => 'custom-id',
                 'email' => 'custom-email',
             ],
-            'spans' => [
-                [
-                    'trace' => [
-                        'type' => 'some-type',
-                        'name' => 'some-span',
-                        'id' => 'span-id',
-                        'parent_span_id' => 'span-parent-id',
-                        'start_time' => 123,
-                        'end_time' => 234,
-                    ],
-                    'database' => [
-                        'name' => 'custom-db-name',
-                        'query' => 'custom-db-query',
-                    ],
-                    'tags' => [
-                        'span-foo' => 'span-bar',
-                    ],
-                ],
-            ],
         ]);
 
-        $this->assertSame($data, $transaction->toArray());
+        $this->assertSame($data, $transaction->serialize());
     }
 
     public function test_construct_with_properties()
@@ -199,12 +198,17 @@ class TransactionTest extends TestCase
         $this->assertNotEmpty($span->id());
     }
 
-    public function test_output_to_array()
+    public function test_serialize()
     {
         $this->transaction->setStartTime(123);
         $this->transaction->setEndTime(234);
 
+        $this->transaction->agent()->setName('php-testing');
+        $this->transaction->http()->setMethod('get');
         $this->transaction->tags()->set('foo', 'bar');
+        $this->transaction->service()->setEnvironment('testing');
+        $this->transaction->system()->setHostname('foo-host');
+        $this->transaction->user()->setId('123');
 
         $span1 = $this->transaction->newSpan('custom', '1')->setStartTime(2)->setEndTime(4);
         $span2 = $this->transaction->newSpan('custom', '2')->setStartTime(2)->setEndTime(4);
@@ -217,25 +221,40 @@ class TransactionTest extends TestCase
                 'start_time' => 123,
                 'end_time' => 234,
             ],
-            'agent' => $this->transaction->agent()->toArray(),
-            'http' => $this->transaction->http()->toArray(),
-            'service' => $this->transaction->service()->toArray(),
-            'system' => $this->transaction->system()->toArray(),
-            'tags' => $this->transaction->tags()->toArray(),
-            'user' => $this->transaction->user()->toArray(),
             'spans' => [
-                $span1->toArray(),
-                $span2->toArray(),
+                $span1->serialize(),
+                $span2->serialize(),
             ],
+            'agent' => $this->transaction->agent()->serialize(),
+            'http' => $this->transaction->http()->serialize(),
+            'service' => $this->transaction->service()->serialize(),
+            'system' => $this->transaction->system()->serialize(),
+            'tags' => ['foo' => 'bar'],
+            'user' => $this->transaction->user()->serialize(),
         ];
 
-        $this->assertEquals($expect, $this->transaction->toArray());
+        $this->assertEquals($expect, $this->transaction->serialize());
     }
 
-    public function test_output_to_array_with_empty_objects()
+    public function test_serialize_partial()
     {
-        $this->transaction->tags()->replaceAll([]);
+        $transaction = new Transaction('id-123', Transaction::TYPE_REQUEST, 'some-transaction');
+        $transaction->setStartTime(123);
+        $transaction->setEndTime(234);
 
-        $this->assertEquals(new stdClass(), $this->transaction->toArray()['tags']);
+        $expect = [
+            'trace' => [
+                'id' => 'id-123',
+                'type' => Transaction::TYPE_REQUEST,
+                'name' => 'some-transaction',
+                'start_time' => 123,
+                'end_time' => 234,
+            ],
+            'spans' => [],
+            'agent' => $transaction->agent()->serialize(),
+            'system' => $transaction->system()->serialize(),
+        ];
+
+        $this->assertSame($expect, $transaction->serialize());
     }
 }

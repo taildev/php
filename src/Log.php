@@ -82,8 +82,8 @@ class Log
             $tags = array_merge(Tail::meta()->tags()->all(), $log['tags']);
             return array_merge($log, [
                 'tags' => $tags,
-                'service' => Tail::meta()->service()->toArray(),
-                'system' => Tail::meta()->system()->toArray(),
+                'service' => Tail::meta()->service()->serialize(),
+                'system' => Tail::meta()->system()->serialize(),
             ]);
         }, static::$logs);
     }

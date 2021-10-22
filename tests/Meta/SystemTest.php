@@ -2,6 +2,7 @@
 
 namespace Tests\Meta;
 
+use stdClass;
 use Tests\TestCase;
 use Tail\Meta\System;
 
@@ -43,10 +44,10 @@ class SystemTest extends TestCase
 
         $system->merge(['hostname' => 'host 2']);
 
-        $this->assertSame(['hostname' => 'host 2'], $system->toArray());
+        $this->assertSame(['hostname' => 'host 2'], $system->serialize());
     }
 
-    public function test_output_to_array()
+    public function test_serialize()
     {
         $system = new System();
         $system->setHostname('foo-host');
@@ -55,6 +56,16 @@ class SystemTest extends TestCase
             'hostname' => 'foo-host',
         ];
 
-        $this->assertSame($expect, $system->toArray());
+        $this->assertSame($expect, $system->serialize());
+    }
+
+    public function test_serialize_empty()
+    {
+        $system = new System();
+        $system->setHostname(null);
+
+        $expect = new stdClass();
+
+        $this->assertEquals($expect, $system->serialize());
     }
 }

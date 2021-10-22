@@ -82,7 +82,7 @@ class JobTrackerTest extends TestCase
             'attempts' => 2,
             'payload' => json_encode(['my' => 'data']),
         ];
-        $this->assertSame($expectedTags, $transaction->tags()->toArray());
+        $this->assertSame($expectedTags, $transaction->tags()->serialize());
     }
 
     public function test_job_processing_creates_a_new_span_for_the_job_if_its_a_sync_driver()
@@ -106,7 +106,7 @@ class JobTrackerTest extends TestCase
             'attempts' => 2,
             'payload' => json_encode(['my' => 'data']),
         ];
-        $this->assertSame($expectedTags, $span->tags()->toArray());
+        $this->assertSame($expectedTags, $span->tags()->serialize());
     }
 
     public function test_job_processing_doesnt_create_a_span_if_job_is_not_set()

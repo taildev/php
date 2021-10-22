@@ -2,6 +2,8 @@
 
 namespace Tail\Meta;
 
+use stdClass;
+
 class User
 {
 
@@ -80,14 +82,21 @@ class User
         return $this;
     }
 
-    /**
-     * Serialize meta information into an array
-     */
-    public function toArray(): array
+    public function serialize()
     {
-        return [
-            'id' => $this->id(),
-            'email' => $this->email(),
-        ];
+        $data = [];
+
+        if (isset($this->id)) {
+            $data['id'] = $this->id;
+        }
+        if (isset($this->email)) {
+            $data['email'] = $this->email;
+        }
+
+        if ($data === []) {
+            return new stdClass();
+        }
+
+        return $data;
     }
 }

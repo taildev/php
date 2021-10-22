@@ -209,7 +209,7 @@ class ApmTest extends TestCase
         $this->assertSame($doneAt, $t->endTime());
     }
 
-    public function test_finish_and_spend_sets_the_end_time_for_any_unfinished_spans()
+    public function test_finish_and_send_sets_the_end_time_for_any_unfinished_spans()
     {
         Tail::init();
         $client = Mockery::mock(Client::class);

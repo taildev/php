@@ -102,6 +102,8 @@ class Http
     {
         if ($method !== null) {
             $this->method = strtoupper($method);
+        } else {
+            $this->method = null;
         }
 
         return $this;
@@ -210,9 +212,7 @@ class Http
      */
     public function setRemoteAddress(?string $address): Http
     {
-        if ($address !== null) {
-            $this->remoteAddress = $address;
-        }
+        $this->remoteAddress = $address;
 
         return $this;
     }
@@ -234,36 +234,39 @@ class Http
         return $this;
     }
 
-    /**
-     * Searialize meta information into array
-     */
-    public function toArray(): array
+    public function serialize()
     {
-        $urlParams = $this->urlParams();
-        if (count($urlParams) === 0) {
-            $urlParams = new stdClass();
+        $data = [];
+
+        if (isset($this->method)) {
+            $data['method'] = $this->method;
+        }
+        if (isset($this->url)) {
+            $data['url'] = $this->url;
+        }
+        if ($this->urlParams !== []) {
+            $data['url_params'] = $this->urlParams;
+        }
+        if ($this->requestHeaders !== []) {
+            $data['request_headers'] = $this->requestHeaders;
+        }
+        if ($this->responseHeaders !== []) {
+            $data['response_headers'] = $this->responseHeaders;
+        }
+        if (isset($this->responseStatus)) {
+            $data['response_status'] = $this->responseStatus;
+        }
+        if (isset($this->remoteAddress)) {
+            $data['remote_address'] = $this->remoteAddress;
         }
 
-        $requestHeaders = $this->requestHeaders();
-        if (count($requestHeaders) === 0) {
-            $requestHeaders = new stdClass();
+        if ($data === []) {
+            return new stdClass();
         }
 
-        $responseHeaders = $this->responseHeaders();
-        if (count($responseHeaders) === 0) {
-            $responseHeaders = new stdClass();
-        }
-
-        return [
-            'method' => $this->method(),
-            'url' => $this->url(),
-            'url_params' => $urlParams,
-            'request_headers' => $requestHeaders,
-            'response_headers' => $responseHeaders,
-            'response_status' => $this->responseStatus(),
-            'remote_address' => $this->remoteAddress(),
-        ];
+        return $data;
     }
+
     /**
      * Get $_SERVER variables if available
      */
@@ -272,6 +275,7 @@ class Http
         if (!isset($_SERVER[$name])) {
             return null;
         }
+
         return $_SERVER[$name];
     }
 }

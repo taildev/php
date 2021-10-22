@@ -2,6 +2,7 @@
 
 namespace Tests\Meta;
 
+use stdClass;
 use Tests\TestCase;
 use Tail\Meta\Agent;
 
@@ -17,6 +18,7 @@ class AgentTest extends TestCase
         $this->assertSame('php', $agent->type());
         $this->assertNotEmpty($agent->version());
     }
+
     public function test_fill_from_array()
     {
         $agent = new Agent();
@@ -40,15 +42,49 @@ class AgentTest extends TestCase
 
         $agent->merge(['name' => 'name 2', 'type' => 'type 2']);
 
-        $this->assertSame(['name' => 'name 2', 'type' => 'type 2', 'version' => 'version 1'], $agent->toArray());
+        $this->assertSame(['name' => 'name 2', 'type' => 'type 2', 'version' => 'version 1'], $agent->serialize());
     }
 
-    public function test_output_to_array()
+    public function test_serialize()
     {
         $agent = new Agent();
+        $agent->setName('tail-testing');
+        $agent->setType('php');
+        $agent->setVersion('v1');
 
-        $this->assertSame('tail-php', $agent->toArray()['name']);
-        $this->assertSame('php', $agent->toArray()['type']);
-        $this->assertNotEmpty($agent->toArray()['version']);
+        $expect = [
+            'name' => 'tail-testing',
+            'type' => 'php',
+            'version' => 'v1',
+        ];
+
+        $this->assertSame($expect, $agent->serialize());
+    }
+
+    public function test_serialize_partial()
+    {
+        $agent = new Agent();
+        $agent->setName('tail-testing');
+        $agent->setType('php');
+        $agent->setVersion(null);
+
+        $expect = [
+            'name' => 'tail-testing',
+            'type' => 'php',
+        ];
+
+        $this->assertSame($expect, $agent->serialize());
+    }
+
+    public function test_serialize_empty()
+    {
+        $agent = new Agent();
+        $agent->setName(null);
+        $agent->setType(null);
+        $agent->setVersion(null);
+
+        $expect = new stdClass();
+
+        $this->assertEquals($expect, $agent->serialize());
     }
 }

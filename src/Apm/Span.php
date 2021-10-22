@@ -2,7 +2,6 @@
 
 namespace Tail\Apm;
 
-use stdClass;
 use Tail\Meta\Tags;
 use Tail\Meta\Database;
 use Tail\Apm\Support\Timestamp;
@@ -63,11 +62,15 @@ class Span
 
         # database properties
         $database = isset($properties['database']) ? $properties['database'] : [];
-        $span->database()->fillFromArray($database);
+        if ($database !== []) {
+            $span->database()->fillFromArray($database);
+        }
 
         # tags
         $tags = isset($properties['tags']) ? $properties['tags'] : [];
-        $span->tags()->replaceAll($tags);
+        if ($tags !== []) {
+            $span->tags()->replaceAll($tags);
+        }
 
         return $span;
     }
@@ -81,9 +84,6 @@ class Span
         $this->parentSpanId = $parentSpanId;
 
         $this->startTime = Timestamp::nowInMs();
-
-        $this->database = new Database();
-        $this->tags = new Tags();
     }
 
     /**
@@ -250,7 +250,19 @@ class Span
      */
     public function database(): Database
     {
+        if ($this->database === null) {
+            $this->database = new Database();
+        }
+
         return $this->database;
+    }
+
+    /**
+     * Determine if database information is set
+     */
+    public function hasDatabase(): bool
+    {
+        return $this->database !== null;
     }
 
     /**
@@ -258,30 +270,46 @@ class Span
      */
     public function tags(): Tags
     {
+        if ($this->tags === null) {
+            $this->tags = new Tags();
+        }
+
         return $this->tags;
+    }
+
+    /**
+     * Determine if tag information is set
+     */
+    public function hasTags(): bool
+    {
+        return $this->tags !== null;
     }
 
     /**
      * Serialize span into an array
      */
-    public function toArray(): array
+    public function serialize()
     {
-        $tags = $this->tags()->toArray();
-        if (count($tags) === 0) {
-            $tags = new stdClass();
-        }
-
-        return [
+        $data = [
             'trace' => [
                 'type' => $this->type(),
                 'name' => $this->name(),
                 'id' => $this->id,
-                'parent_span_id' => $this->parentSpanId(),
                 'start_time' => $this->startTime(),
                 'end_time' => $this->endTime(),
             ],
-            'database' => $this->database()->toArray(),
-            'tags' => $tags,
         ];
+
+        if (isset($this->parentSpanId)) {
+            $data['trace']['parent_span_id'] = $this->parentSpanId;
+        }
+        if ($this->hasDatabase()) {
+            $data['database'] = $this->database()->serialize();
+        }
+        if ($this->hasTags()) {
+            $data['tags'] = $this->tags()->serialize();
+        }
+
+        return $data;
     }
 }

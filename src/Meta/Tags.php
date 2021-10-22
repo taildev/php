@@ -2,6 +2,8 @@
 
 namespace Tail\Meta;
 
+use stdClass;
+
 class Tags
 {
 
@@ -75,13 +77,13 @@ class Tags
         return $this;
     }
 
-    /**
-     * Serialize meta information into an array
-     *
-     * @return array
-     */
-    public function toArray()
+    public function serialize()
     {
-        return $this->all();
+        $data = $this->all();
+        if ($data === []) {
+            return new stdClass();
+        }
+
+        return $data;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Meta;
 
+use stdClass;
 use Tests\TestCase;
 use Tail\Meta\Database;
 
@@ -43,7 +44,7 @@ class DatabaseTest extends TestCase
         $this->assertSame('select *', $this->database->query());
     }
 
-    public function test_output_to_array()
+    public function test_serialize()
     {
         $database = new Database();
         $database->setName('mysql');
@@ -54,6 +55,30 @@ class DatabaseTest extends TestCase
             'query' => 'select *',
         ];
 
-        $this->assertSame($expect, $database->toArray());
+        $this->assertSame($expect, $database->serialize());
+    }
+
+    public function test_serialize_partial()
+    {
+        $database = new Database();
+        $database->setName(null);
+        $database->setQuery('select *');
+
+        $expect = [
+            'query' => 'select *',
+        ];
+
+        $this->assertSame($expect, $database->serialize());
+    }
+
+    public function test_serialize_empty()
+    {
+        $database = new Database();
+        $database->setName(null);
+        $database->setQuery(null);
+
+        $expect = new stdClass();
+
+        $this->assertEquals($expect, $database->serialize());
     }
 }

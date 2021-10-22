@@ -135,7 +135,7 @@ class HttpTest extends TestCase
         $this->assertSame('127.0.0.1', $this->http->remoteAddress());
     }
 
-    public function test_output_to_array()
+    public function test_serialize()
     {
         $http = new Http();
         $http->setMethod('get');
@@ -156,18 +156,37 @@ class HttpTest extends TestCase
             'remote_address' => '127.0.0.1',
         ];
 
-        $this->assertSame($expect, $http->toArray());
+        $this->assertSame($expect, $http->serialize());
     }
 
-    public function test_output_to_array_with_empty_objects()
+    public function test_serialize_partial()
     {
         $http = new Http();
-        $http->setUrlParams([]);
+        $http->setMethod(null);
         $http->setRequestHeaders([]);
-        $http->setResponseHeaders([]);
+        $http->setUrl('/foo');
+        $http->setRemoteAddress('127.0.0.1');
+        $http->setResponseStatus(200);
 
-        $this->assertEquals(new stdClass(), $http->toArray()['url_params']);
-        $this->assertEquals(new stdClass(), $http->toArray()['request_headers']);
-        $this->assertEquals(new stdClass(), $http->toArray()['response_headers']);
+        $expect = [
+            'url' => '/foo',
+            'response_status' => 200,
+            'remote_address' => '127.0.0.1',
+        ];
+
+        $this->assertSame($expect, $http->serialize());
+    }
+
+    public function test_serialize_empty()
+    {
+        $http = new Http();
+        $http->setUrl(null);
+        $http->setRemoteAddress(null);
+        $http->setMethod(null);
+        $http->setRequestHeaders([]);
+
+        $expect = new stdClass();
+
+        $this->assertEquals($expect, $http->serialize());
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Tail\Meta;
 
+use stdClass;
+
 class Database
 {
 
@@ -61,14 +63,21 @@ class Database
         return $this;
     }
 
-    /**
-     * Serialize meta information as an array
-     */
-    public function toArray(): array
+    public function serialize()
     {
-        return [
-            'name' => $this->name(),
-            'query' => $this->query(),
-        ];
+        $data = [];
+
+        if (isset($this->name)) {
+            $data['name'] = $this->name;
+        }
+        if (isset($this->query)) {
+            $data['query'] = $this->query;
+        }
+
+        if ($data === []) {
+            return new stdClass();
+        }
+
+        return $data;
     }
 }

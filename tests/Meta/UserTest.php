@@ -2,6 +2,7 @@
 
 namespace Tests\Meta;
 
+use stdClass;
 use Tests\TestCase;
 use Tail\Meta\User;
 
@@ -50,10 +51,10 @@ class UserTest extends TestCase
 
         $user->merge(['email' => '2@2.com']);
 
-        $this->assertSame(['id' => '1', 'email' => '2@2.com'], $user->toArray());
+        $this->assertSame(['id' => '1', 'email' => '2@2.com'], $user->serialize());
     }
 
-    public function test_output_to_array()
+    public function test_serialize()
     {
         $user = new User();
         $user->setId('foo-123');
@@ -64,6 +65,27 @@ class UserTest extends TestCase
             'email' => 'user@example.com',
         ];
 
-        $this->assertSame($expect, $user->toArray());
+        $this->assertSame($expect, $user->serialize());
+    }
+
+    public function test_serialize_partial()
+    {
+        $user = new User();
+        $user->setEmail('user@example.com');
+
+        $expect = [
+            'email' => 'user@example.com',
+        ];
+
+        $this->assertSame($expect, $user->serialize());
+    }
+
+    public function test_serialize_empty()
+    {
+        $user = new User();
+
+        $expect = new stdClass();
+
+        $this->assertEquals($expect, $user->serialize());
     }
 }

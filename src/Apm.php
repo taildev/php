@@ -187,7 +187,7 @@ class Apm
         }
 
         if (Tail::apmEnabled()) {
-            Tail::client()->sendApm($t->toArray());
+            Tail::client()->sendApm($t->serialize());
         }
 
         static::$t = null;
@@ -195,10 +195,39 @@ class Apm
 
     protected static function mergeTransactionMetadata(Transaction $t)
     {
-        $t->tags()->merge(Tail::tags()->toArray());
-        $t->user()->merge(Tail::user()->toArray());
-        $t->agent()->merge(Tail::agent()->toArray());
-        $t->system()->merge(Tail::system()->toArray());
-        $t->service()->merge(Tail::service()->toArray());
+        if (Tail::meta()->hasTags()) {
+            $tags = Tail::tags()->serialize();
+            if (is_array($tags)) {
+                $t->tags()->merge($tags);
+            }
+        }
+
+        if (Tail::meta()->hasUser()) {
+            $user = Tail::user()->serialize();
+            if (is_array($user)) {
+                $t->user()->merge($user);
+            }
+        }
+
+        if (Tail::meta()->hasAgent()) {
+            $agent = Tail::agent()->serialize();
+            if (is_array($agent)) {
+                $t->agent()->merge($agent);
+            }
+        }
+
+        if (Tail::meta()->hasSystem()) {
+            $system = Tail::system()->serialize();
+            if (is_array($system)) {
+                $t->system()->merge($system);
+            }
+        }
+
+        if (Tail::meta()->hasService()) {
+            $service = Tail::service()->serialize();
+            if (is_array($service)) {
+                $t->service()->merge($service);
+            }
+        }
     }
 }

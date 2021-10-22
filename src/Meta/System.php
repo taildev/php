@@ -2,6 +2,8 @@
 
 namespace Tail\Meta;
 
+use stdClass;
+
 class System
 {
 
@@ -57,13 +59,18 @@ class System
         return $this;
     }
 
-    /**
-     * Serialize meta information into an array
-     */
-    public function toArray(): array
+    public function serialize()
     {
-        return [
-            'hostname' => $this->hostname(),
-        ];
+        $data = [];
+
+        if (isset($this->hostname)) {
+            $data['hostname'] = $this->hostname;
+        }
+
+        if ($data === []) {
+            return new stdClass();
+        }
+
+        return $data;
     }
 }

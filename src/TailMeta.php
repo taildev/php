@@ -26,73 +26,99 @@ class TailMeta
     /** @var User User metadata */
     protected $user;
 
-    public function __construct()
-    {
-        $this->agent = new Agent();
-        $this->service = new Service();
-        $this->system = new System();
-        $this->tags = new Tags();
-        $this->user = new User();
-    }
-
     /**
      * Get/set agent metadata
-     *
-     * @return Agent
      */
     public function agent(): Agent
     {
+        if ($this->agent === null) {
+            $this->agent = new Agent();
+        }
         return $this->agent;
     }
 
     /**
+     * Determine if agent information is set
+     */
+    public function hasAgent(): bool
+    {
+        return $this->agent !== null;
+    }
+
+    /**
      * Get/set service metadata
-     *
-     * @return Service
      */
     public function service(): Service
     {
+        if ($this->service === null) {
+            $this->service = new Service();
+        }
+
         return $this->service;
+    }
+
+    public function hasService(): bool
+    {
+        return $this->service !== null;
     }
 
     /**
      * Get/set system metadata
-     *
-     * @return System
      */
     public function system(): System
     {
+        if ($this->system === null) {
+            $this->system = new System();
+        }
+
         return $this->system;
     }
 
     /**
+     * Determine if system information is present
+     */
+    public function hasSystem(): bool
+    {
+        return $this->system !== null;
+    }
+
+    /**
      * Get/set custom metadata
-     *
-     * @return Tags
      */
     public function tags(): Tags
     {
+        if ($this->tags === null) {
+            $this->tags = new Tags();
+        }
+
         return $this->tags;
     }
 
     /**
+     * Determine if tag information is present
+     */
+    public function hasTags(): bool
+    {
+        return $this->tags !== null;
+    }
+
+    /**
      * Get/set user metadata
-     *
-     * @return User
      */
     public function user(): User
     {
+        if ($this->user === null) {
+            $this->user = new User();
+        }
+
         return $this->user;
     }
 
-    public function toArray()
+    /**
+     * Determine if user information is present
+     */
+    public function hasUser(): bool
     {
-        return [
-            'agent' => $this->agent->toArray(),
-            'service' => $this->service->toArray(),
-            'system' => $this->system->toArray(),
-            'tags' => $this->tags->toArray(),
-            'user' => $this->user->toArray(),
-        ];
+        return $this->user !== null;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Tail\Meta;
 
+use stdClass;
+
 class Service
 {
 
@@ -78,16 +80,21 @@ class Service
         return $this;
     }
 
-    /**
-     * Serialize meta information into an array
-     *
-     * @return array
-     */
-    public function toArray()
+    public function serialize()
     {
-        return [
-            'name' => $this->name(),
-            'environment' => $this->environment(),
-        ];
+        $data = [];
+
+        if (isset($this->name)) {
+            $data['name'] = $this->name;
+        }
+        if (isset($this->environment)) {
+            $data['environment'] = $this->environment;
+        }
+
+        if ($data === []) {
+            return new stdClass();
+        }
+
+        return $data;
     }
 }

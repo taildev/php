@@ -3,7 +3,6 @@
 namespace Tests\Apm;
 
 use Mockery;
-use stdClass;
 use Tail\Apm\Span;
 use Tests\TestCase;
 use Tail\Apm\Transaction;
@@ -32,9 +31,9 @@ class SpanTest extends TestCase
                'type' => 'some-type',
                'name' => 'some-span',
                'id' => 'id-123',
-               'parent_span_id' => 'parent-span-id',
                'start_time' => 123,
                'end_time' => 234,
+               'parent_span_id' => 'parent-span-id',
            ],
            'database' => [
                'name' => 'some-database',
@@ -45,7 +44,7 @@ class SpanTest extends TestCase
            ],
         ]);
 
-        $this->assertSame($data, $span->toArray());
+        $this->assertSame($data, $span->serialize());
     }
 
     public function test_construct_with_properties()
@@ -160,32 +159,51 @@ class SpanTest extends TestCase
         $this->assertEqualsWithDelta($expectedFinishTime, $this->span->endTime(), 5);
     }
 
-    public function test_output_to_array()
+    public function test_serialize()
     {
         $this->span->setStartTime(123);
         $this->span->setEndTime(234);
         $this->span->tags()->set('foo', 'bar');
+        $this->span->database()->setName('mysql');
+        $this->span->database()->setQuery('select * from foo');
 
         $expect = [
             'trace' => [
                 'type' => 'some-type',
                 'name' => 'some-span',
                 'id' => 'id-123',
+                'start_time' => 123,
+                'end_time' => 234,
                 'parent_span_id' => 'parent-span-id',
+            ],
+            'database' => [
+                'name' => 'mysql',
+                'query' => 'select * from foo',
+            ],
+            'tags' => [
+                'foo' => 'bar'
+            ],
+        ];
+
+        $this->assertEquals($expect, $this->span->serialize());
+    }
+
+    public function test_serialize_partial()
+    {
+        $span = new Span($this->transaction, 'some-type', 'some-span', 'id-123');
+        $span->setStartTime(123);
+        $span->setEndTime(234);
+
+        $expect = [
+            'trace' => [
+                'type' => 'some-type',
+                'name' => 'some-span',
+                'id' => 'id-123',
                 'start_time' => 123,
                 'end_time' => 234,
             ],
-            'database' => $this->span->database()->toArray(),
-            'tags' => $this->span->tags()->toArray(),
         ];
 
-        $this->assertSame($expect, $this->span->toArray());
-    }
-
-    public function test_output_to_array_with_empty_objects()
-    {
-        $this->span->tags()->replaceAll([]);
-
-        $this->assertEquals(new stdClass(), $this->span->toArray()['tags']);
+        $this->assertEquals($expect, $span->serialize());
     }
 }

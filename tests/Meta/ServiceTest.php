@@ -2,6 +2,7 @@
 
 namespace Tests\Meta;
 
+use stdClass;
 use Tests\TestCase;
 use Tail\Meta\Service;
 
@@ -47,10 +48,10 @@ class ServiceTest extends TestCase
 
         $service->merge(['environment' => 'env 2']);
 
-        $this->assertSame(['name' => 'name 1', 'environment' => 'env 2'], $service->toArray());
+        $this->assertSame(['name' => 'name 1', 'environment' => 'env 2'], $service->serialize());
     }
 
-    public function test_output_to_array()
+    public function test_serialize()
     {
         $service = new Service('foo', 'foo-env');
         $expect = [
@@ -58,6 +59,23 @@ class ServiceTest extends TestCase
             'environment' => 'foo-env',
         ];
 
-        $this->assertSame($expect, $service->toArray());
+        $this->assertSame($expect, $service->serialize());
+    }
+
+    public function test_serialize_partial()
+    {
+        $service = new Service('foo');
+        $expect = [
+            'name' => 'foo',
+        ];
+
+        $this->assertSame($expect, $service->serialize());
+    }
+
+    public function test_serialize_empty()
+    {
+        $service = new Service();
+        $expect = new stdClass();
+        $this->assertEquals($expect, $service->serialize());
     }
 }

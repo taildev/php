@@ -2,6 +2,8 @@
 
 namespace Tail\Meta;
 
+use stdClass;
+
 class Agent
 {
 
@@ -144,17 +146,24 @@ class Agent
         return $this;
     }
 
-    /**
-     * Serialize meta information as an array
-     *
-     * @return array
-     */
-    public function toArray()
+    public function serialize()
     {
-        return [
-            'name' => $this->name(),
-            'type' => $this->type(),
-            'version' => $this->version(),
-        ];
+        $data = [];
+
+        if (isset($this->name)) {
+            $data['name'] = $this->name;
+        }
+        if (isset($this->type)) {
+            $data['type'] = $this->type;
+        }
+        if (isset($this->version)) {
+            $data['version'] = $this->version;
+        }
+
+        if ($data === []) {
+            return new stdClass();
+        }
+
+        return $data;
     }
 }

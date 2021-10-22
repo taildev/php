@@ -2,7 +2,6 @@
 
 namespace Tail\Apm;
 
-use stdClass;
 use Tail\Meta\User;
 use Tail\Meta\Tags;
 use Tail\Meta\Http;
@@ -81,23 +80,33 @@ class Transaction
 
         # agent properties
         $agent = isset($properties['agent']) ? $properties['agent'] : [];
-        $transaction->agent()->fillFromArray($agent);
+        if ($agent !== []) {
+            $transaction->agent()->fillFromArray($agent);
+        }
 
         # http properties
         $http = isset($properties['http']) ? $properties['http'] : [];
-        $transaction->http()->fillFromArray($http);
+        if ($http !== []) {
+            $transaction->http()->fillFromArray($http);
+        }
 
         # system properties
         $system = isset($properties['system']) ? $properties['system'] : [];
-        $transaction->system()->fillFromArray($system);
+        if ($system !== []) {
+            $transaction->system()->fillFromArray($system);
+        }
 
         # tags
         $tags = isset($properties['tags']) ? $properties['tags'] : [];
-        $transaction->tags()->replaceAll($tags);
+        if ($tags !== []) {
+            $transaction->tags()->replaceAll($tags);
+        }
 
         # user properties
         $user = isset($properties['user']) ? $properties['user'] : [];
-        $transaction->user()->fillFromArray($user);
+        if ($user !== []) {
+            $transaction->user()->fillFromArray($user);
+        }
 
         # spans
         $spans = isset($properties['spans']) ? $properties['spans'] : [];
@@ -120,11 +129,7 @@ class Transaction
         $this->startTime = Timestamp::nowInMs();
 
         $this->agent = new Agent();
-        $this->http = new Http();
-        $this->service = new Service();
         $this->system = new System();
-        $this->tags = new Tags();
-        $this->user = new User();
         $this->spans = [];
     }
 
@@ -229,7 +234,19 @@ class Transaction
      */
     public function agent(): Agent
     {
+        if ($this->agent === null) {
+            $this->agent = new Agent();
+        }
+
         return $this->agent;
+    }
+
+    /**
+     * Determine if agent information is present
+     */
+    public function hasAgent(): bool
+    {
+        return $this->agent !== null;
     }
 
     /**
@@ -237,7 +254,19 @@ class Transaction
      */
     public function service(): Service
     {
+        if ($this->service === null) {
+            $this->service = new Service();
+        }
+
         return $this->service;
+    }
+
+    /**
+     * Determine if service information is present
+     */
+    public function hasService(): bool
+    {
+        return $this->service !== null;
     }
 
     /**
@@ -245,7 +274,19 @@ class Transaction
      */
     public function http(): Http
     {
+        if ($this->http === null) {
+            $this->http = new Http();
+        }
+
         return $this->http;
+    }
+
+    /**
+     * Determine if HTTP information is present
+     */
+    public function hasHttp(): bool
+    {
+        return $this->http !== null;
     }
 
     /**
@@ -253,7 +294,19 @@ class Transaction
      */
     public function system(): System
     {
+        if ($this->system === null) {
+            $this->system = new System();
+        }
+
         return $this->system;
+    }
+
+    /**
+     * Determine if system information is present
+     */
+    public function hasSystem(): bool
+    {
+        return $this->system !== null;
     }
 
     /**
@@ -261,7 +314,19 @@ class Transaction
      */
     public function tags(): Tags
     {
+        if ($this->tags === null) {
+            $this->tags = new Tags();
+        }
+
         return $this->tags;
+    }
+
+    /**
+     * Determine if tag information is present
+     */
+    public function hasTags(): bool
+    {
+        return $this->tags !== null;
     }
 
     /**
@@ -269,7 +334,19 @@ class Transaction
      */
     public function user(): User
     {
+        if ($this->user === null) {
+            $this->user = new User();
+        }
+
         return $this->user;
+    }
+
+    /**
+     * Determine if user information is presetn
+     */
+    public function hasUser(): bool
+    {
+        return $this->user !== null;
     }
 
     /**
@@ -325,22 +402,14 @@ class Transaction
         return $this->newSpan($name, Span::TYPE_FILESYSTEM, $parentSpanId);
     }
 
-    /**
-     * Serialize transaction as an array
-     */
-    public function toArray(): array
+    public function serialize()
     {
         $spanData = [];
         foreach ($this->spans() as $span) {
-            $spanData[] = $span->toArray();
+            $spanData[] = $span->serialize();
         }
 
-        $tags = $this->tags()->toArray();
-        if (count($tags) === 0) {
-            $tags = new stdClass();
-        }
-
-        return [
+        $data = [
             'trace' => [
                 'id' => $this->id(),
                 'type' => $this->type(),
@@ -348,13 +417,28 @@ class Transaction
                 'start_time' => $this->startTime(),
                 'end_time' => $this->endTime(),
             ],
-            'agent' => $this->agent()->toArray(),
-            'http' => $this->http()->toArray(),
-            'service' => $this->service()->toArray(),
-            'system' => $this->system()->toArray(),
-            'tags' => $tags,
-            'user' => $this->user()->toArray(),
             'spans' => $spanData,
         ];
+
+        if ($this->hasAgent()) {
+            $data['agent'] = $this->agent()->serialize();
+        }
+        if ($this->hasHttp()) {
+            $data['http'] = $this->http()->serialize();
+        }
+        if ($this->hasService()) {
+            $data['service'] = $this->service()->serialize();
+        }
+        if ($this->hasSystem()) {
+            $data['system'] = $this->system()->serialize();
+        }
+        if ($this->hasTags()) {
+            $data['tags'] = $this->tags()->serialize();
+        }
+        if ($this->hasUser()) {
+            $data['user'] = $this->user()->serialize();
+        }
+
+        return $data;
     }
 }

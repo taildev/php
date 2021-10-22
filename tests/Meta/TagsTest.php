@@ -2,6 +2,7 @@
 
 namespace Tests\Meta;
 
+use stdClass;
 use Tests\TestCase;
 use Tail\Meta\Tags;
 
@@ -49,7 +50,7 @@ class TagsTest extends TestCase
         ]);
     }
 
-    public function test_output_to_array()
+    public function test_serialize()
     {
         $data = [
             'foo' => 'bar',
@@ -58,6 +59,14 @@ class TagsTest extends TestCase
         ];
         $tags = new Tags($data);
 
-        $this->assertSame($data, $tags->toArray());
+        $this->assertSame($data, $tags->serialize());
+    }
+
+    public function test_serialize_empty()
+    {
+        $tags = new Tags([]);
+
+        $expect = new stdClass();
+        $this->assertEquals($expect, $tags->serialize());
     }
 }
