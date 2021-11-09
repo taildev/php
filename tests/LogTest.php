@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Mockery;
+use stdClass;
 use Tail\Client;
 use Tail\Log;
 use Tail\Tail;
@@ -99,6 +100,38 @@ class LogTest extends TestCase
         ]);
 
         $client->shouldReceive('sendLogs')->with([$expectLog1, $expectLog2])->once();
+
+        Log::flush();
+    }
+
+    public function test_flush_logs_encodes_empty_meta_appropriately()
+    {
+        Tail::init(['logs_enabled' => true]);
+        $client = Mockery::mock(Client::class);
+        Tail::setClient($client);
+        Tail::meta()->service()->setName(null)->setEnvironment(null);
+        Tail::meta()->system()->setHostname(null);
+
+        Log::$logs = [];
+        Log::debug('message 1');
+        Log::info('message 2');
+
+        $expectLog1 = array_merge(Log::$logs[0], [
+            'tags' => new stdClass(),
+            'service' => new stdClass(),
+            'system' => new stdClass(),
+        ]);
+        $expectLog2 = array_merge(Log::$logs[1], [
+            'tags' => new stdClass(),
+            'service' => new stdClass(),
+            'system' => new stdClass(),
+        ]);
+
+        $client->shouldReceive('sendLogs')->withArgs(function($logs) use ($expectLog1, $expectLog2) {
+            $this->assertEquals($expectLog1, $logs[0]);
+            $this->assertEquals($expectLog2, $logs[1]);
+            return true;
+        })->once();
 
         Log::flush();
     }

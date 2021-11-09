@@ -2,6 +2,8 @@
 
 namespace Tail;
 
+use stdClass;
+
 class Log
 {
 
@@ -80,6 +82,10 @@ class Log
     {
         return array_map(function ($log) {
             $tags = array_merge(Tail::meta()->tags()->all(), $log['tags']);
+            if ($tags === []) {
+                $tags = new stdClass();
+            }
+
             return array_merge($log, [
                 'tags' => $tags,
                 'service' => Tail::meta()->service()->serialize(),
