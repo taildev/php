@@ -33,6 +33,7 @@ class TransactionTest extends TestCase
                 'name' => 'custom-name',
                 'start_time' => 123,
                 'end_time' => 456,
+                'duration' => 4,
             ],
             'spans' => [
                 [
@@ -42,6 +43,7 @@ class TransactionTest extends TestCase
                         'id' => 'span-id',
                         'start_time' => 123,
                         'end_time' => 234,
+                        'duration' => 3,
                         'parent_span_id' => 'span-parent-id',
                     ],
                     'database' => [
@@ -202,6 +204,7 @@ class TransactionTest extends TestCase
     {
         $this->transaction->setStartTime(123);
         $this->transaction->setEndTime(234);
+        $this->transaction->setDuration(4);
 
         $this->transaction->agent()->setName('php-testing');
         $this->transaction->http()->setMethod('get');
@@ -220,6 +223,7 @@ class TransactionTest extends TestCase
                 'name' => 'some-transaction',
                 'start_time' => 123,
                 'end_time' => 234,
+                'duration' => 4,
             ],
             'spans' => [
                 $span1->serialize(),
@@ -249,6 +253,7 @@ class TransactionTest extends TestCase
                 'name' => 'some-transaction',
                 'start_time' => 123,
                 'end_time' => 234,
+                'duration' => null,
             ],
             'spans' => [],
             'agent' => $transaction->agent()->serialize(),

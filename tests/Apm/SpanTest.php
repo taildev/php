@@ -33,6 +33,7 @@ class SpanTest extends TestCase
                'id' => 'id-123',
                'start_time' => 123,
                'end_time' => 234,
+               'duration' => 3,
                'parent_span_id' => 'parent-span-id',
            ],
            'database' => [
@@ -163,6 +164,7 @@ class SpanTest extends TestCase
     {
         $this->span->setStartTime(123);
         $this->span->setEndTime(234);
+        $this->span->setDuration(4);
         $this->span->tags()->set('foo', 'bar');
         $this->span->database()->setName('mysql');
         $this->span->database()->setQuery('select * from foo');
@@ -174,6 +176,7 @@ class SpanTest extends TestCase
                 'id' => 'id-123',
                 'start_time' => 123,
                 'end_time' => 234,
+                'duration' => 4,
                 'parent_span_id' => 'parent-span-id',
             ],
             'database' => [
@@ -201,6 +204,7 @@ class SpanTest extends TestCase
                 'id' => 'id-123',
                 'start_time' => 123,
                 'end_time' => 234,
+                'duration' => null,
             ],
         ];
 

@@ -35,6 +35,9 @@ class Span
     /** @var int End time as milliseconds since epoch */
     protected $endTime;
 
+    /** @var int Duration as milliseconds */
+    protected $duration;
+
     /** @var Database Meta information for a span that tracks a  database call */
     protected $database;
 
@@ -54,11 +57,13 @@ class Span
         $parentSpanId = isset($trace['parent_span_id']) ? $trace['parent_span_id'] : null;
         $startTime = $trace['start_time'];
         $endTime = isset($trace['end_time']) ? $trace['end_time'] : null;
+        $duration = isset($trace['duration']) ? $trace['duration'] : null;
 
         # create span
         $span = new Span($transaction, $type, $name, $id, $parentSpanId);
         $span->setStartTime($startTime);
         $span->setEndTime($endTime);
+        $span->setDuration($duration);
 
         # database properties
         $database = isset($properties['database']) ? $properties['database'] : [];
@@ -237,6 +242,23 @@ class Span
     }
 
     /**
+     * Get the duration for the span as milliseconds
+     */
+    public function duration(): ?int
+    {
+        return $this->duration;
+    }
+
+    /**
+     * Set the duration for the span
+     */
+    public function setDuration(?int $duration): Span
+    {
+        $this->duration = $duration;
+        return $this;
+    }
+
+    /**
      * Mark the span as finished now, or with the provided custom time (represented as milliseconds since epoch).
      */
     public function finish(?int $at = null): Span
@@ -297,6 +319,7 @@ class Span
                 'id' => $this->id,
                 'start_time' => $this->startTime(),
                 'end_time' => $this->endTime(),
+                'duration' => $this->duration(),
             ],
         ];
 

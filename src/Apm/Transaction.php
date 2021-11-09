@@ -32,6 +32,9 @@ class Transaction
     /** @var int End time as milliseconds since epoch */
     protected $endTime;
 
+    /** @var int Duration as milliseconds */
+    protected $duration;
+
     /** @var Agent Meta information for transaction agent */
     protected $agent;
 
@@ -65,6 +68,7 @@ class Transaction
         $name = $trace['name'];
         $startTime = $trace['start_time'];
         $endTime = isset($trace['end_time']) ? $trace['end_time'] : null;
+        $duration = isset($trace['duration']) ? $trace['duration'] : null;
 
         # service properties
         $service = $properties['service'];
@@ -75,6 +79,7 @@ class Transaction
         $transaction = new Transaction($id, $type, $name);
         $transaction->setStartTime($startTime);
         $transaction->setEndTime($endTime);
+        $transaction->setDuration($duration);
         $transaction->service()->setName($serviceName);
         $transaction->service()->setEnvironment($environment);
 
@@ -216,6 +221,23 @@ class Transaction
     public function setEndTime(?int $endTime): Transaction
     {
         $this->endTime = $endTime;
+        return $this;
+    }
+
+    /**
+     * Get the transactions duration, represented as milliseconds.
+     */
+    public function duration(): ?int
+    {
+        return $this->duration;
+    }
+
+    /**
+     * Set the duration for the transaction represented as milliseconds.
+     */
+    public function setDuration(?int $duration): Transaction
+    {
+        $this->duration = $duration;
         return $this;
     }
 
@@ -416,6 +438,7 @@ class Transaction
                 'name' => $this->name(),
                 'start_time' => $this->startTime(),
                 'end_time' => $this->endTime(),
+                'duration' => $this->duration(),
             ],
             'spans' => $spanData,
         ];
