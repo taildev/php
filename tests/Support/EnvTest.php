@@ -7,7 +7,6 @@ use Tail\Support\Env;
 
 class EnvTest extends TestCase
 {
-
     public function test_get_env_uses_static_env_value()
     {
         putenv('PATH=custom');

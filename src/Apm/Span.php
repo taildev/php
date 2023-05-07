@@ -8,41 +8,40 @@ use Tail\Apm\Support\Timestamp;
 
 class Span
 {
-
     public const TYPE_DATABASE = 'database';
     public const TYPE_CACHE = 'cache';
     public const TYPE_FILESYSTEM = 'filesystem';
     public const TYPE_CUSTOM = 'custom';
 
-    /** @var Transaction Transaction that span belongs to */
-    protected $transaction;
+    /** Transaction that span belongs to */
+    protected Transaction $transaction;
 
-    /** @var string Type of span */
-    protected $type;
+    /** Type of span */
+    protected string $type;
 
-    /** @var string Name to identify span */
-    protected $name;
+    /** Name to identify span */
+    protected string $name;
 
-    /** @var string Unique ID for span */
-    protected $id;
+    /** Unique ID for span */
+    protected string $id;
 
-    /** @var string|null ID that span belongs to*/
-    protected $parentSpanId;
+    /** ID that span belongs to*/
+    protected ?string $parentSpanId = null;
 
-    /** @var int Start time as milliseconds since epoch */
-    protected $startTime;
+    /** Start time as milliseconds since epoch */
+    protected int $startTime;
 
-    /** @var int End time as milliseconds since epoch */
-    protected $endTime;
+    /** End time as milliseconds since epoch */
+    protected ?int $endTime = null;
 
-    /** @var int Duration as milliseconds */
-    protected $duration;
+    /** Duration as milliseconds */
+    protected ?int $duration = null;
 
-    /** @var Database Meta information for a span that tracks a  database call */
-    protected $database;
+    /** Meta information for a span that tracks a  database call */
+    protected ?Database $database = null;
 
-    /** @var Tags Custom meta information for span */
-    protected $tags;
+    /** Custom meta information for span */
+    protected ?Tags $tags = null;
 
     /**
      * Deserialize formatted properties array into Span object
@@ -54,10 +53,10 @@ class Span
         $type = $trace['type'];
         $name = $trace['name'];
         $id = $trace['id'];
-        $parentSpanId = isset($trace['parent_span_id']) ? $trace['parent_span_id'] : null;
+        $parentSpanId = $trace['parent_span_id'] ?? null;
         $startTime = $trace['start_time'];
-        $endTime = isset($trace['end_time']) ? $trace['end_time'] : null;
-        $duration = isset($trace['duration']) ? $trace['duration'] : null;
+        $endTime = $trace['end_time'] ?? null;
+        $duration = $trace['duration'] ?? null;
 
         # create span
         $span = new Span($transaction, $type, $name, $id, $parentSpanId);
@@ -66,13 +65,13 @@ class Span
         $span->setDuration($duration);
 
         # database properties
-        $database = isset($properties['database']) ? $properties['database'] : [];
+        $database = $properties['database'] ?? [];
         if ($database !== []) {
             $span->database()->fillFromArray($database);
         }
 
         # tags
-        $tags = isset($properties['tags']) ? $properties['tags'] : [];
+        $tags = $properties['tags'] ?? [];
         if ($tags !== []) {
             $span->tags()->replaceAll($tags);
         }
@@ -310,7 +309,7 @@ class Span
     /**
      * Serialize span into an array
      */
-    public function serialize()
+    public function serialize(): array
     {
         $data = [
             'trace' => [

@@ -8,7 +8,6 @@ use Tail\Meta\Agent;
 
 class AgentTest extends TestCase
 {
-
     protected $agent;
 
     public function test_create_default()

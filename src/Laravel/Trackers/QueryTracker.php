@@ -9,7 +9,6 @@ use Illuminate\Contracts\Foundation\Application;
 
 class QueryTracker implements Tracker
 {
-
     /**
      * @param Application $app
      */

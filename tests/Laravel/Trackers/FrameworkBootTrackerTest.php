@@ -10,7 +10,6 @@ use Illuminate\Contracts\Foundation\Application;
 
 class FrameworkBootTrackerTest extends TestCase
 {
-
     /** @var FrameworkBootTracker */
     protected $tracker;
 

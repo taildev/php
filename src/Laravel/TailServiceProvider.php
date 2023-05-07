@@ -8,7 +8,6 @@ use Illuminate\Support\ServiceProvider;
 
 class TailServiceProvider extends ServiceProvider
 {
-
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/../../config/tail.php', 'tail');

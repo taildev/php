@@ -6,7 +6,6 @@ use stdClass;
 
 class Tags
 {
-
     /** @var array Custom meta information */
     protected $tags = [];
 

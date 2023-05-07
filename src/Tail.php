@@ -6,7 +6,6 @@ use Tail\Support\Env;
 
 class Tail
 {
-
     /** @var bool */
     public static $initialized = false;
 

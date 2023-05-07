@@ -8,7 +8,6 @@ use Tests\TestCase;
 
 class HttpTest extends TestCase
 {
-
     protected $http;
 
     public function setUp(): void

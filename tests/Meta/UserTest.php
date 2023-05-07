@@ -8,7 +8,6 @@ use Tail\Meta\User;
 
 class UserTest extends TestCase
 {
-
     protected $user;
 
     public function setUp(): void

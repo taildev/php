@@ -6,7 +6,6 @@ use stdClass;
 
 class Agent
 {
-
     /** @var ?string Agent name */
     protected $name;
 

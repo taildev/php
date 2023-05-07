@@ -8,7 +8,6 @@ use Illuminate\Contracts\Foundation\Application;
 
 class FrameworkBootTracker implements Tracker
 {
-
     /** @var Span */
     protected $span;
 

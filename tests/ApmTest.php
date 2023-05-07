@@ -11,7 +11,6 @@ use Tail\Apm\Transaction;
 
 class ApmTest extends TestCase
 {
-
     public function test_getting_a_transaction_starts_a_new_one_if_not_already_started()
     {
         Apm::reset();

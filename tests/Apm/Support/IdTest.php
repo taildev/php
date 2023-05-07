@@ -7,7 +7,6 @@ use Tail\Apm\Support\Id;
 
 class IdTest extends TestCase
 {
-
     public function test_generate_new_id()
     {
         $id1 = Id::generate();

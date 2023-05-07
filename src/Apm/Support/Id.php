@@ -6,7 +6,6 @@ use Ramsey\Uuid\Uuid;
 
 class Id
 {
-
     /**
      * Generate a new unique ID
      */

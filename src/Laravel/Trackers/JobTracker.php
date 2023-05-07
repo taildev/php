@@ -12,7 +12,6 @@ use Illuminate\Contracts\Foundation\Application;
 
 class JobTracker implements Tracker
 {
-
     /** @var Application */
     protected $app;
 

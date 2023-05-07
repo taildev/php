@@ -10,7 +10,6 @@ use Tail\Meta\User;
 
 class TailMeta
 {
-
     /** @var Agent Agent metadata */
     protected $agent;
 

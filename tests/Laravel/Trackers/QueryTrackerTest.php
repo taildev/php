@@ -11,9 +11,7 @@ use Illuminate\Database\Events\QueryExecuted;
 
 class QueryTrackerTest extends TestCase
 {
-
-    /** @var QueryTracker */
-    protected $tracker;
+    protected QueryTracker $tracker;
 
     public function setUp(): void
     {

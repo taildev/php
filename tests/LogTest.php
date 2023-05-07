@@ -10,7 +10,6 @@ use Tail\Tail;
 
 class LogTest extends TestCase
 {
-
     public function setUp(): void
     {
         parent::setUp();
@@ -127,7 +126,7 @@ class LogTest extends TestCase
             'system' => new stdClass(),
         ]);
 
-        $client->shouldReceive('sendLogs')->withArgs(function($logs) use ($expectLog1, $expectLog2) {
+        $client->shouldReceive('sendLogs')->withArgs(function ($logs) use ($expectLog1, $expectLog2) {
             $this->assertEquals($expectLog1, $logs[0]);
             $this->assertEquals($expectLog2, $logs[1]);
             return true;

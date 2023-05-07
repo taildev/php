@@ -7,7 +7,6 @@ use Tail\Client;
 
 class ClientTest extends TestCase
 {
-
     /** @var Client */
     protected $client;
 
@@ -78,7 +77,8 @@ class ClientTest extends TestCase
         $handler = function () {
             global $v;
             $v = true;
-            return false;;
+            return false;
+            ;
         };
 
         $this->client->registerApmSendHandler($handler);

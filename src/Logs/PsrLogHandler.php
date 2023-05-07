@@ -7,7 +7,6 @@ use Psr\Log\LoggerInterface;
 
 class PsrLogHandler implements LoggerInterface
 {
-
     /**
      * System is unusable.
      *

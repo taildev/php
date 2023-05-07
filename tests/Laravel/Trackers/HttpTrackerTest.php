@@ -16,7 +16,6 @@ use Illuminate\Foundation\Http\Events\RequestHandled;
 
 class HttpTrackerTest extends TestCase
 {
-
     public function test_track_http_request()
     {
         Apm::startCustom('whatever');

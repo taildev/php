@@ -8,7 +8,6 @@ use Tail\Meta\Service;
 
 class ServiceTest extends TestCase
 {
-
     /** @var Service */
     protected $service;
 

@@ -6,7 +6,6 @@ use stdClass;
 
 class System
 {
-
     /** @var string Hostname of system */
     protected $hostname;
 

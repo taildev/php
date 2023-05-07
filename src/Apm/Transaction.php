@@ -13,7 +13,6 @@ use Tail\Apm\Support\Timestamp;
 
 class Transaction
 {
-
     public const TYPE_REQUEST = 'request';
     public const TYPE_JOB = 'job';
 
@@ -389,7 +388,7 @@ class Transaction
     }
 
     /**
-     * Create a new child span for the transaction. 
+     * Create a new child span for the transaction.
      */
     public function newSpan($name, $type = Span::TYPE_CUSTOM, $parentSpanId = null): Span
     {

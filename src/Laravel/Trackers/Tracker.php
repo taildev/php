@@ -6,7 +6,6 @@ use Illuminate\Contracts\Foundation\Application;
 
 interface Tracker
 {
-
     /**
      * @param Application $app
      */

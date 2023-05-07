@@ -6,7 +6,6 @@ use stdClass;
 
 class Log
 {
-
     public static $logs = [];
 
     public static function emergency(string $message, array $tags = [])

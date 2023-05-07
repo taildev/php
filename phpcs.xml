@@ -16,11 +16,6 @@
         <severity>0</severity>
     </rule>
 
-    <!-- camel case variables, disabled for now cuz there's lots -->
-<!--    <rule ref="Squiz.NamingConventions.ValidVariableName.NotCamelCaps"/>-->
-<!--    <rule ref="Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps"/>-->
-<!--    <rule ref="Squiz.NamingConventions.ValidVariableName.StringNotCamelCaps"/>-->
-
     <!-- allow underscore method names in tests -->
     <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
         <exclude-pattern>./tests/*</exclude-pattern>

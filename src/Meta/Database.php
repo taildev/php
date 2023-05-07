@@ -6,7 +6,6 @@ use stdClass;
 
 class Database
 {
-
     /** @var string Name of database */
     protected $name;
 

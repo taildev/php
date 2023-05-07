@@ -10,7 +10,6 @@ use Tail\Apm\Transaction;
 
 class Apm
 {
-
     /** @var Transaction|null */
     protected static $t;
 

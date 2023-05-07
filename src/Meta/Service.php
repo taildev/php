@@ -6,7 +6,6 @@ use stdClass;
 
 class Service
 {
-
     /** @var string|null Name to identify service */
     protected $name;
 

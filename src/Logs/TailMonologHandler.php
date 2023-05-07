@@ -7,7 +7,6 @@ use Monolog\Handler\AbstractProcessingHandler;
 
 class TailMonologHandler extends AbstractProcessingHandler
 {
-
     public function write(array $record): void
     {
         $level = $record['level_name'];

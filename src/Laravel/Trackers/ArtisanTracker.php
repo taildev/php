@@ -7,7 +7,6 @@ use Illuminate\Contracts\Foundation\Application;
 
 class ArtisanTracker implements Tracker
 {
-
     /**
      *
      * @param Application $app

@@ -6,7 +6,6 @@ use Tail\Tail;
 
 class TailTest extends TestCase
 {
-
     public function test_init_with_no_config()
     {
         Tail::$initialized = false;

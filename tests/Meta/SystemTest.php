@@ -8,7 +8,6 @@ use Tail\Meta\System;
 
 class SystemTest extends TestCase
 {
-
     protected $system;
 
     public function setUp(): void

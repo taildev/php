@@ -18,7 +18,6 @@ use Illuminate\Contracts\Config\Repository as Config;
 
 class JobTrackerTest extends TestCase
 {
-
     /** @var JobTracker */
     protected $tracker;
 

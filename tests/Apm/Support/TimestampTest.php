@@ -7,7 +7,6 @@ use Tail\Apm\Support\Timestamp;
 
 class TimestampTest extends TestCase
 {
-
     public function test_now_in_ms()
     {
         $expected = ceil(microtime(true) * 1000);

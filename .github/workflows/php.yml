@@ -2,9 +2,9 @@ name: PHP tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   test:
@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [7.4]
+        php: [7.4, 8.0, 8.1, 8.2]
     steps:
     - name: Checkout code
       uses: actions/checkout@v2

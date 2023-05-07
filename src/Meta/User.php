@@ -6,7 +6,6 @@ use stdClass;
 
 class User
 {
-
     /** @var mixed Unique id for user */
     protected $id;
 

@@ -11,7 +11,6 @@ use Tail\Logs\TailMonologHandler;
 
 class TailMonologHandlerTest extends TestCase
 {
-
     protected $handler;
 
     public function setUp(): void

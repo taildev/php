@@ -10,7 +10,6 @@ use Tests\TestCase;
 
 class TransactionTest extends TestCase
 {
-
     /** @var Transaction */
     protected $transaction;
 

@@ -10,7 +10,6 @@ use Illuminate\Contracts\Foundation\Application;
 
 class ArtisanTrackerTest extends TestCase
 {
-
     public function test_ignores_non_console_transactions()
     {
         $tracker = Mockery::mock(ArtisanTracker::class)->makePartial();

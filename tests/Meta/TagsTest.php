@@ -8,7 +8,6 @@ use Tail\Meta\Tags;
 
 class TagsTest extends TestCase
 {
-
     public function test_get_and_set_tags()
     {
         $tags = new Tags(['foo' => 'bar']);

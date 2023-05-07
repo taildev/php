@@ -8,7 +8,6 @@ use Tail\Meta\Database;
 
 class DatabaseTest extends TestCase
 {
-
     /** @var Database */
     protected $database;
 

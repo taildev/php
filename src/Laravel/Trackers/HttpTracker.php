@@ -12,7 +12,6 @@ use Illuminate\Foundation\Http\Events\RequestHandled;
 
 class HttpTracker implements Tracker
 {
-
     /**
      * @param Application $app
      */
@@ -34,10 +33,10 @@ class HttpTracker implements Tracker
 
         $status = null;
         if (method_exists($event->response, 'status')) {
-          $status = $event->response->status();
+            $status = $event->response->status();
         }
         if (method_exists($event->response, 'getStatusCode')) {
-          $status = $event->response->getStatusCode();
+            $status = $event->response->getStatusCode();
         }
 
         Apm::transaction()

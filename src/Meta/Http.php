@@ -6,7 +6,6 @@ use stdClass;
 
 class Http
 {
-
     /** @var string HTTP method */
     protected $method;
 

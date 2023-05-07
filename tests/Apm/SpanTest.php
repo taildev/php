@@ -10,7 +10,6 @@ use Tail\Apm\Support\Timestamp;
 
 class SpanTest extends TestCase
 {
-
     /** @var Span */
     protected $span;
 

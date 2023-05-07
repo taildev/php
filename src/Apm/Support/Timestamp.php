@@ -4,7 +4,6 @@ namespace Tail\Apm\Support;
 
 class Timestamp
 {
-
     /**
      * Current timestamp in milliseconds since epoch
      */
