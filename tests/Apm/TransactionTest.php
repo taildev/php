@@ -59,6 +59,9 @@ class TransactionTest extends TestCase
                 'type' => 'custom-agent-type',
                 'version' => 'custom-agent-version',
             ],
+            'system' => [
+                'hostname' => 'custom-hostname',
+            ],
             'http' => [
                 'method' => 'CUSTOM-HTTP-METHOD',
                 'url' => 'custom-url',
@@ -71,9 +74,6 @@ class TransactionTest extends TestCase
             'service' => [
                 'name' => 'custom-service',
                 'environment' => 'custom-env',
-            ],
-            'system' => [
-                'hostname' => 'custom-hostname',
             ],
             'tags' => [
                 'custom' => 'tag',

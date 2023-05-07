@@ -4,7 +4,7 @@ namespace Tail\Support;
 
 class Env
 {
-    public static function get($key)
+    public static function get(string $key)
     {
         $value = null;
 

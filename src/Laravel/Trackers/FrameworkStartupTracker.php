@@ -8,13 +8,9 @@ use Illuminate\Contracts\Foundation\Application;
 
 class FrameworkStartupTracker implements Tracker
 {
-    /** @var Span */
-    protected $span;
+    protected ?Span $span = null;
 
-    /**
-     * @var Application $app
-     */
-    public function register($app)
+    public function register(Application $app)
     {
         $start = defined('LARAVEL_START') ? LARAVEL_START * 1000 : microtime(true) * 1000;
         $this->span = Apm::newSpan('Framework startup', 'framework')->setStartTime($start);
@@ -24,10 +20,7 @@ class FrameworkStartupTracker implements Tracker
         });
     }
 
-    /**
-     * @var Application $app
-     */
-    public function onStartBoot($app)
+    public function onStartBoot(Application $app)
     {
         if (!$this->span) {
             return;
@@ -36,10 +29,7 @@ class FrameworkStartupTracker implements Tracker
         $this->span->finish();
     }
 
-    /**
-     * @return Span|null
-     */
-    public function getSpan()
+    public function getSpan(): ?Span
     {
         return $this->span;
     }

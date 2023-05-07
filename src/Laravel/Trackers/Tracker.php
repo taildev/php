@@ -6,8 +6,5 @@ use Illuminate\Contracts\Foundation\Application;
 
 interface Tracker
 {
-    /**
-     * @param Application $app
-     */
-    public function register($app);
+    public function register(Application $app);
 }

@@ -16,44 +16,44 @@ class Transaction
     public const TYPE_REQUEST = 'request';
     public const TYPE_JOB = 'job';
 
-    /** @var string Unique ID for transaction */
-    protected $id;
+    /** Unique ID for transaction */
+    protected string $id;
 
-    /** @var string Type of transaction */
-    protected $type;
+    /** Type of transaction */
+    protected string $type;
 
-    /** @var string|null Name to identify transaction */
-    protected $name;
+    /** Name to identify transaction */
+    protected ?string $name = null;
 
-    /** @var int Start time as milliseconds since epoch */
-    protected $startTime;
+    /** Start time as milliseconds since epoch */
+    protected int $startTime;
 
-    /** @var int End time as milliseconds since epoch */
-    protected $endTime;
+    /** End time as milliseconds since epoch */
+    protected ?int $endTime = null;
 
-    /** @var int Duration as milliseconds */
-    protected $duration;
+    /** Duration as milliseconds */
+    protected ?int $duration = null;
 
-    /** @var Agent Meta information for transaction agent */
-    protected $agent;
+    /** Meta information for transaction agent */
+    protected Agent $agent;
 
-    /** @var Http Meta information for request transaction */
-    protected $http;
+    /** Meta information for request transaction */
+    protected ?Http $http = null;
 
-    /** @var Service Meta information for transaction service */
-    protected $service;
+    /** Meta information for transaction service */
+    protected ?Service $service = null;
 
-    /** @var System Meta information for transaction system */
-    protected $system;
+    /** Meta information for transaction system */
+    protected System $system;
 
-    /** @var Tags Custom meta tags */
-    protected $tags;
+    /** Custom meta tags */
+    protected ?Tags $tags = null;
 
-    /** @var User Meta information for transaction user */
-    protected $user;
+    /** Meta information for transaction user */
+    protected ?User $user = null;
 
     /** @var Span[] Spans that occur during transaction */
-    protected $spans;
+    protected array $spans;
 
     /**
      * Deserialize formatted properties array into Transaction object
@@ -66,13 +66,13 @@ class Transaction
         $type = $trace['type'];
         $name = $trace['name'];
         $startTime = $trace['start_time'];
-        $endTime = isset($trace['end_time']) ? $trace['end_time'] : null;
-        $duration = isset($trace['duration']) ? $trace['duration'] : null;
+        $endTime = $trace['end_time'] ?? null;
+        $duration = $trace['duration'] ?? null;
 
         # service properties
         $service = $properties['service'];
-        $serviceName = isset($service['name']) ? $service['name'] : null;
-        $environment = isset($service['environment']) ? $service['environment'] : null;
+        $serviceName = $service['name'] ?? null;
+        $environment = $service['environment'] ?? null;
 
         # create transaction
         $transaction = new Transaction($id, $type, $name);
@@ -83,37 +83,37 @@ class Transaction
         $transaction->service()->setEnvironment($environment);
 
         # agent properties
-        $agent = isset($properties['agent']) ? $properties['agent'] : [];
+        $agent = $properties['agent'] ?? [];
         if ($agent !== []) {
             $transaction->agent()->fillFromArray($agent);
         }
 
         # http properties
-        $http = isset($properties['http']) ? $properties['http'] : [];
+        $http = $properties['http'] ?? [];
         if ($http !== []) {
             $transaction->http()->fillFromArray($http);
         }
 
         # system properties
-        $system = isset($properties['system']) ? $properties['system'] : [];
+        $system = $properties['system'] ?? [];
         if ($system !== []) {
             $transaction->system()->fillFromArray($system);
         }
 
         # tags
-        $tags = isset($properties['tags']) ? $properties['tags'] : [];
+        $tags = $properties['tags'] ?? [];
         if ($tags !== []) {
             $transaction->tags()->replaceAll($tags);
         }
 
         # user properties
-        $user = isset($properties['user']) ? $properties['user'] : [];
+        $user = $properties['user'] ?? [];
         if ($user !== []) {
             $transaction->user()->fillFromArray($user);
         }
 
         # spans
-        $spans = isset($properties['spans']) ? $properties['spans'] : [];
+        $spans = $properties['spans'] ?? [];
         foreach ($spans as $spanProperties) {
             $span = Span::createFromArray($transaction, $spanProperties);
             $transaction->pushSpan($span);
@@ -255,19 +255,7 @@ class Transaction
      */
     public function agent(): Agent
     {
-        if ($this->agent === null) {
-            $this->agent = new Agent();
-        }
-
         return $this->agent;
-    }
-
-    /**
-     * Determine if agent information is present
-     */
-    public function hasAgent(): bool
-    {
-        return $this->agent !== null;
     }
 
     /**
@@ -315,19 +303,7 @@ class Transaction
      */
     public function system(): System
     {
-        if ($this->system === null) {
-            $this->system = new System();
-        }
-
         return $this->system;
-    }
-
-    /**
-     * Determine if system information is present
-     */
-    public function hasSystem(): bool
-    {
-        return $this->system !== null;
     }
 
     /**
@@ -423,7 +399,7 @@ class Transaction
         return $this->newSpan($name, Span::TYPE_FILESYSTEM, $parentSpanId);
     }
 
-    public function serialize()
+    public function serialize(): array
     {
         $spanData = [];
         foreach ($this->spans() as $span) {
@@ -442,17 +418,13 @@ class Transaction
             'spans' => $spanData,
         ];
 
-        if ($this->hasAgent()) {
-            $data['agent'] = $this->agent()->serialize();
-        }
+        $data['agent'] = $this->agent()->serialize();
+        $data['system'] = $this->system()->serialize();
         if ($this->hasHttp()) {
             $data['http'] = $this->http()->serialize();
         }
         if ($this->hasService()) {
             $data['service'] = $this->service()->serialize();
-        }
-        if ($this->hasSystem()) {
-            $data['system'] = $this->system()->serialize();
         }
         if ($this->hasTags()) {
             $data['tags'] = $this->tags()->serialize();

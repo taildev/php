@@ -7,11 +7,7 @@ use Illuminate\Contracts\Foundation\Application;
 
 class ArtisanTracker implements Tracker
 {
-    /**
-     *
-     * @param Application $app
-     */
-    public function register($app)
+    public function register(Application $app)
     {
         if ($app->runningInConsole()) {
             $this->registerArtisan($app);

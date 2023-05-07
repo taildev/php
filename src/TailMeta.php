@@ -10,20 +10,20 @@ use Tail\Meta\User;
 
 class TailMeta
 {
-    /** @var Agent Agent metadata */
-    protected $agent;
+    /** Agent metadata */
+    protected ?Agent $agent = null;
 
-    /** @var Service Service metadata */
-    protected $service;
+    /** Service metadata */
+    protected ?Service $service = null;
 
-    /** @var System System metadata */
-    protected $system;
+    /** System metadata */
+    protected ?System $system = null;
 
-    /** @var Tags Custom metadata */
-    protected $tags;
+    /** Custom metadata */
+    protected ?Tags $tags = null;
 
-    /** @var User User metadata */
-    protected $user;
+    /** User metadata */
+    protected ?User $user = null;
 
     /**
      * Get/set agent metadata

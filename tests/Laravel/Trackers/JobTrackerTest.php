@@ -41,10 +41,9 @@ class JobTrackerTest extends TestCase
         $this->dispatcher->shouldReceive('listen')->with(JobProcessed::class, Mockery::any());
         $this->dispatcher->shouldReceive('listen')->with(JobFailed::class, Mockery::any());
         $this->config = Mockery::mock(Config::class);
-        $this->application = [
-            'events' => $this->dispatcher,
-            'config' => $this->config,
-        ];
+        $this->application = Mockery::mock(Application::class);
+        $this->application->shouldReceive('make')->with('events')->andReturn($this->dispatcher);
+        $this->application->shouldReceive('make')->with('config')->andReturn($this->config);
 
         $this->tracker = new JobTracker();
         $this->tracker->register($this->application);

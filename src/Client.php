@@ -7,13 +7,13 @@ class Client
     public const LOGS_ENDPOINT = 'https://ingest.tail.dev/logs';
     public const APM_ENDPOINT = 'https://ingest.tail.dev/traces';
 
-    protected $token;
+    protected ?string $token = null;
 
-    protected $logSendHandlers = [];
+    protected array $logSendHandlers = [];
 
-    protected $apmSendHandlers = [];
+    protected array $apmSendHandlers = [];
 
-    public function __construct($token)
+    public function __construct(?string $token)
     {
         $this->token = $token;
         $this->registerDefaultLogSendHandler();
@@ -50,7 +50,7 @@ class Client
         }
     }
 
-    public function token()
+    public function token(): ?string
     {
         return $this->token;
     }

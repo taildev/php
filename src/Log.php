@@ -6,7 +6,7 @@ use stdClass;
 
 class Log
 {
-    public static $logs = [];
+    public static array $logs = [];
 
     public static function emergency(string $message, array $tags = [])
     {
@@ -77,7 +77,7 @@ class Log
         static::$logs = [];
     }
 
-    protected static function logsWithMetadata()
+    protected static function logsWithMetadata(): array
     {
         return array_map(function ($log) {
             $tags = array_merge(Tail::meta()->tags()->all(), $log['tags']);

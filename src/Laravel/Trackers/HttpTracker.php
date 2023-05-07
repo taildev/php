@@ -12,10 +12,7 @@ use Illuminate\Foundation\Http\Events\RequestHandled;
 
 class HttpTracker implements Tracker
 {
-    /**
-     * @param Application $app
-     */
-    public function register($app)
+    public function register(Application $app)
     {
         $app['events']->listen(RequestHandled::class, [$this, 'requestHandled']);
     }

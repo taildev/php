@@ -9,10 +9,7 @@ use Illuminate\Contracts\Foundation\Application;
 
 class QueryTracker implements Tracker
 {
-    /**
-     * @param Application $app
-     */
-    public function register($app)
+    public function register(Application $app)
     {
         $app['events']->listen(QueryExecuted::class, [$this, 'queryExecuted']);
     }

@@ -12,25 +12,20 @@ use Illuminate\Contracts\Foundation\Application;
 
 class JobTracker implements Tracker
 {
-    /** @var Application */
-    protected $app;
+    protected ?Application $app = null;
 
     /**
      * Track spans by job id for sync processing
      * ['id' => $span]
-     * @var array
      */
-    protected $spans = [];
+    protected array $spans = [];
 
-    /**
-     * @param Application $app
-     */
-    public function register($app)
+    public function register(Application $app)
     {
         $this->app = $app;
-        $app['events']->listen(JobProcessing::class, [$this, 'jobProcessing']);
-        $app['events']->listen(JobProcessed::class, [$this, 'jobProcessed']);
-        $app['events']->listen(JobFailed::class, [$this, 'jobFailed']);
+        $app->make('events')->listen(JobProcessing::class, [$this, 'jobProcessing']);
+        $app->make('events')->listen(JobProcessed::class, [$this, 'jobProcessed']);
+        $app->make('events')->listen(JobFailed::class, [$this, 'jobFailed']);
     }
 
     public function jobProcessing(JobProcessing $event)
@@ -85,22 +80,18 @@ class JobTracker implements Tracker
         }
     }
 
-    public function getSpans()
+    public function getSpans(): array
     {
         return $this->spans;
     }
 
-    protected function isSyncDriver($connection)
+    protected function isSyncDriver($connection): bool
     {
-        $driver = $this->app['config']->get('queue.connections.' . $connection . '.driver');
+        $driver = $this->app->make('config')->get('queue.connections.' . $connection . '.driver');
         return $driver === 'sync';
     }
 
-    /**
-     * @param Span|null $span
-     * @param string $status
-     */
-    protected function finishSpan($span, $status)
+    protected function finishSpan(?Span $span, string $status)
     {
         if (!$span) {
             return;
@@ -110,10 +101,7 @@ class JobTracker implements Tracker
         $span->finish();
     }
 
-    /**
-     * @param string $status
-     */
-    protected function finishTransaction($status)
+    protected function finishTransaction(string $status)
     {
         Apm::transaction()->tags()->set('job_status', $status);
         Apm::finish();

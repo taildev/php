@@ -6,26 +6,15 @@ use Tail\Support\Env;
 
 class Tail
 {
-    /** @var bool */
-    public static $initialized = false;
+    public static bool $initialized = false;
 
-    /** @var bool */
-    protected static $apmEnabled;
+    protected static bool $apmEnabled = true;
 
-    /** @var bool */
-    protected static $logsEnabled;
+    protected static bool $logsEnabled = true;
 
-    /** @var string */
-    protected static $service;
+    protected static ?TailMeta $meta = null;
 
-    /** @var string */
-    protected static $environment;
-
-    /** @var TailMeta */
-    protected static $meta;
-
-    /** @var Client */
-    protected static $client;
+    protected static ?Client $client = null;
 
     public static function init(array $config = [])
     {
@@ -114,10 +103,7 @@ class Tail
         Log::flush();
     }
 
-    /**
-     * @return Client
-     */
-    public static function client()
+    public static function client(): Client
     {
         if (!static::$initialized) {
             static::init();
@@ -126,10 +112,7 @@ class Tail
         return self::$client;
     }
 
-    /**
-     * @return bool
-     */
-    public static function apmEnabled()
+    public static function apmEnabled(): bool
     {
         if (!static::$initialized) {
             static::init();
@@ -154,10 +137,7 @@ class Tail
         static::$apmEnabled = true;
     }
 
-    /**
-     * @return bool
-     */
-    public static function logsEnabled()
+    public static function logsEnabled(): bool
     {
         if (!static::$initialized) {
             static::init();
@@ -182,10 +162,7 @@ class Tail
         static::$logsEnabled = true;
     }
 
-    /**
-     * @return TailMeta
-     */
-    public static function meta()
+    public static function meta(): TailMeta
     {
         if (!static::$initialized) {
             static::init();
@@ -199,42 +176,27 @@ class Tail
         static::$client = $client;
     }
 
-    /**
-     * @return \Tail\Meta\Tags
-     */
-    public static function tags()
+    public static function tags(): \Tail\Meta\Tags
     {
         return static::meta()->tags();
     }
 
-    /**
-     * @return \Tail\Meta\User
-     */
-    public static function user()
+    public static function user(): \Tail\Meta\User
     {
         return static::meta()->user();
     }
 
-    /**
-     * @return \Tail\Meta\Agent
-     */
-    public static function agent()
+    public static function agent(): \Tail\Meta\Agent
     {
         return static::meta()->agent();
     }
 
-    /**
-     * @return \Tail\Meta\System
-     */
-    public static function system()
+    public static function system(): \Tail\Meta\System
     {
         return static::meta()->system();
     }
 
-    /**
-     * @return \Tail\Meta\Service
-     */
-    public static function service()
+    public static function service(): \Tail\Meta\Service
     {
         return static::meta()->service();
     }

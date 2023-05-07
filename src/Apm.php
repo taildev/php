@@ -10,8 +10,7 @@ use Tail\Apm\Transaction;
 
 class Apm
 {
-    /** @var Transaction|null */
-    protected static $t;
+    protected static ?Transaction $t = null;
 
     /**
      * Remove the current transaction
@@ -107,7 +106,7 @@ class Apm
     /**
      * Set end time for transaction. If a transaction has not started yet a new one will be created.
      *
-     * @param float $time Unix timestamp in milliseconds
+     * @param float|null $time Unix timestamp in milliseconds
      */
     public static function setEndTime(?float $time)
     {
@@ -169,10 +168,6 @@ class Apm
     public static function finish()
     {
         $t = static::transaction();
-        if (!$t) {
-            return;
-        }
-
         static::mergeTransactionMetadata($t);
 
         if ($t->endTime() === null) {

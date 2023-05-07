@@ -8,13 +8,9 @@ use Illuminate\Contracts\Foundation\Application;
 
 class FrameworkBootTracker implements Tracker
 {
-    /** @var Span */
-    protected $span;
+    protected ?Span $span = null;
 
-    /**
-     * @var Application $app
-     */
-    public function register($app)
+    public function register(Application $app)
     {
         $app->booting(function ($app) {
             $this->onStartBoot($app);
@@ -25,18 +21,12 @@ class FrameworkBootTracker implements Tracker
         });
     }
 
-    /**
-     * @var Application $app
-     */
-    public function onStartBoot($app)
+    public function onStartBoot(Application $app)
     {
         $this->span = Apm::newSpan('Framework boot', 'framework');
     }
 
-    /**
-     * @var Application $app
-     */
-    public function onFinishBoot($app)
+    public function onFinishBoot(Application $app)
     {
         if (!$this->span) {
             return;
@@ -45,10 +35,7 @@ class FrameworkBootTracker implements Tracker
         $this->span->finish();
     }
 
-    /**
-     * @return Span|null
-     */
-    public function getSpan()
+    public function getSpan(): ?Span
     {
         return $this->span;
     }

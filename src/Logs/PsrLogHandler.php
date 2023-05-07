@@ -15,11 +15,9 @@ class PsrLogHandler implements LoggerInterface
      *
      * @param mixed   $level
      * @param string  $message
-     * @param mixed[] $context
+     * @param array $context
      *
      * @return void
-     *
-     * @throws \Psr\Log\InvalidArgumentException
      */
     public function log($level, $message, array $context = array()): void
     {
